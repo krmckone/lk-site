@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -78,9 +80,12 @@ func replaceVars(md []byte, p params) []byte {
 				i++
 			}
 			end := i + 2
+			fmt.Println(string(md[start+2 : end-1]))
+			copy(md[start+2:end-1], bytes.TrimSpace(md[start+2:end-1]))
+			fmt.Println(string(md[start+2 : end-1]))
 			v = strings.TrimSpace(v)
 			locs[v] = loc{start, end}
-			md = []byte(strings.Replace(string(md), "{{ "+v+" }}", p[v], -1))
+			md = []byte(strings.Replace(string(md), "{{"+v+"}}", p[v], -1))
 		}
 		i++
 	}
