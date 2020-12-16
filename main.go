@@ -9,6 +9,7 @@ import (
 	"unicode"
 
 	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
 	"gopkg.in/yaml.v2"
 )
 
@@ -112,7 +113,14 @@ func main() {
 
 	md := readFile("resources/index.md")
 	md = preproccess(md, config.Template.Params)
-	output := markdown.ToHTML(md, nil, nil)
+	htmlOpts := html.RendererOptions{
+		CSS:   "styles.css",
+		Flags: html.CommonFlags | html.CompletePage | html.TOC,
+	}
+	renderer := html.NewRenderer(htmlOpts)
+	output := markdown.ToHTML(md, nil, renderer)
 	mkdir("build")
+	css := readFile("resources/css/styles.css")
+	writeFile("build/styles.css", css)
 	writeFile("build/index.html", output)
 }
