@@ -1,4 +1,3 @@
-## {{ title }} markdown document. My name is {{ myName }}.  
-This is {{ projectName }}.  
+## My name is {{myName}} and this is my site.
 
-Welcome to the site!
+This is {{projectName}}.

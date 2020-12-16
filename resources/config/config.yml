@@ -1,5 +1,4 @@
 template:
     params:
-      title: "Hello, World!!!!"
-      myName: "Kaleb McKone"
       projectName: "A Static Site Generator"
+      myName: "Kaleb McKone"
