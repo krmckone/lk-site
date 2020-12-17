@@ -1,0 +1,6 @@
+template:
+    params:
+      projectName: "A Static Site Generator"
+      myName: "Kaleb McKone"
+    styles:
+      sheetURL: "https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
