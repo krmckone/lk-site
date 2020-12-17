@@ -1,4 +1,0 @@
-template:
-    params:
-      projectName: "A Static Site Generator"
-      myName: "Kaleb McKone"
