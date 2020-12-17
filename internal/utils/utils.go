@@ -24,7 +24,7 @@ func WriteFile(path string, b []byte) {
 
 // Mkdir wrapper for os.Mkdir
 func Mkdir(path string) {
-	if err := os.Mkdir("build", 0755); err != nil {
+	if err := os.Mkdir(path, 0755); err != nil {
 		if !os.IsNotExist(err) {
 			log.Fatal(err)
 		}
@@ -33,7 +33,7 @@ func Mkdir(path string) {
 
 // Clean cleans the directory at path
 func Clean(path string) {
-	if err := os.RemoveAll("build"); err != nil {
+	if err := os.RemoveAll(path); err != nil {
 		log.Fatal(err)
 	}
 }

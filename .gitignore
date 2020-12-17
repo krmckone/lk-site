@@ -16,3 +16,6 @@
 
 # Build artifacts
 build
+
+# MacOS file system description
+.DS_Store
