@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 	"github.com/krmckone/ksite/internal/config"
 	"github.com/krmckone/ksite/internal/preprocessor"
 	"github.com/krmckone/ksite/internal/utils"
@@ -17,8 +18,9 @@ func main() {
 		CSS:   config.Template.Styles.SheetURL,
 		Flags: html.CommonFlags | html.CompletePage,
 	}
+	parser := parser.NewWithExtensions(parser.CommonExtensions | parser.Attributes)
 	renderer := html.NewRenderer(htmlOpts)
-	output := markdown.ToHTML(md, nil, renderer)
+	output := markdown.ToHTML(md, parser, renderer)
 	utils.Mkdir("build")
 	utils.WriteFile("build/index.html", output)
 }
