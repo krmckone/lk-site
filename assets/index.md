@@ -1,5 +1,5 @@
 {.block}
-My name is {{myName}} and this is my site.
+My name is {{ .myName }} and this is my site.
 
 {.block}
-This is {{projectName}}.
+This is {{ .projectName }}.
