@@ -9,58 +9,109 @@ import (
 
 func TestReplaceVars(t *testing.T) {
 	cases := []struct {
-		md     []byte
-		p      config.Params
-		expect []byte
+		md        []byte
+		p         config.Params
+		expect    []byte
+		expectErr bool
 	}{
-		{[]byte("Hello"), config.Params{}, []byte("Hello")},
-		{[]byte("Hello {{ myName }}"), config.Params{"myName": "Kaleb"}, []byte("Hello Kaleb")},
-		{[]byte("Hello {{myName }}"), config.Params{"myName": "Kaleb"}, []byte("Hello Kaleb")},
-		{[]byte("Hello {{ myName}}"), config.Params{"myName": "Kaleb"}, []byte("Hello Kaleb")},
-		{[]byte("Hello {{ myName		}}"), config.Params{"myName": "Kaleb"}, []byte("Hello Kaleb")},
+		// 0
 		{
-			[]byte("Hello {{ myName }}. Welcome to {{ projN }}"),
+			[]byte("Hello"),
+			config.Params{},
+			[]byte("Hello"),
+			false,
+		},
+		// 1
+		{
+			[]byte("Hello {{ .myName }}"),
+			config.Params{"myName": "Kaleb"},
+			[]byte("Hello Kaleb"),
+			false,
+		},
+		// 2
+		{
+			[]byte("Hello {{ .myName }}"),
+			config.Params{"myName": "Kaleb"},
+			[]byte("Hello Kaleb"),
+			false,
+		},
+		// 3
+		{
+			[]byte("Hello {{ .myName}}"),
+			config.Params{"myName": "Kaleb"},
+			[]byte("Hello Kaleb"),
+			false,
+		},
+		// 4
+		{
+			[]byte("Hello {{ .myName		}}"),
+			config.Params{"myName": "Kaleb"},
+			[]byte("Hello Kaleb"),
+			false,
+		},
+		// 5
+		{
+			[]byte("Hello {{ .myName }}. Welcome to {{ .projN }}"),
 			config.Params{"myName": "Kaleb", "projN": "Testing"},
 			[]byte("Hello Kaleb. Welcome to Testing"),
+			false,
 		},
+		// 6
 		{
-			[]byte("Hello {{ myName }}. Welcome to {{ projN }"),
+			[]byte("Hello {{ .myName }}. Welcome to {{ .projN }"),
 			config.Params{"myName": "Kaleb", "projN": "Testing"},
-			[]byte("Hello Kaleb. Welcome to {{ projN }"),
+			[]byte("Hello Kaleb. Welcome to {{ .projN }"),
+			true,
 		},
+		// 7
 		{
-			[]byte("Hello {{ myName }}. Welcome to { projN }"),
+			[]byte("Hello {{ .myName }}. Welcome to { .projN }"),
 			config.Params{"myName": "Kaleb", "projN": "Testing"},
-			[]byte("Hello Kaleb. Welcome to { projN }"),
+			[]byte("Hello Kaleb. Welcome to { .projN }"),
+			false,
 		},
+		// 8
 		{
-			[]byte("Hello { myName }}. Welcome to { projN }"),
+			[]byte("Hello { .myName }}. Welcome to {{ .projN }"),
 			config.Params{"myName": "Kaleb", "projN": "Testing"},
-			[]byte("Hello { myName }}. Welcome to { projN }"),
+			[]byte("Hello { .myName }}. Welcome to { .projN }"),
+			true,
 		},
+		// 9
 		{
-			[]byte("{{ greeting }}. It's good to see you, {{ myName }}. Welcome to {{ projN }}"),
+			[]byte("{{ .greeting }}. It's good to see you, {{ .myName }}. Welcome to {{ .projN }}"),
 			config.Params{"greeting": "Hello", "myName": "Kaleb", "projN": "Testing"},
 			[]byte("Hello. It's good to see you, Kaleb. Welcome to Testing"),
+			false,
 		},
+		// 10
 		{
-			[]byte("{{ greeting }} {{ myName }}. Welcome to {{ projN }}"),
+			[]byte("{{ .greeting }} {{ .myName }}. Welcome to {{ .projN }}"),
 			config.Params{"greeting": "Hello", "myName": "Kaleb", "projN": "Testing"},
 			[]byte("Hello Kaleb. Welcome to Testing"),
+			false,
 		},
+		// 11
 		{
-			[]byte("{{ firstPart }}{{ lastPart }}, {{myName}}. Welcome to {{ projN }}"),
+			[]byte("{{ .firstPart }}{{ .lastPart }}, {{.myName}}. Welcome to {{ .projN }}"),
 			config.Params{"firstPart": "Hel", "lastPart": "lo", "myName": "Kaleb", "projN": "Testing"},
 			[]byte("Hello, Kaleb. Welcome to Testing"),
+			false,
 		},
 	}
-	for _, c := range cases {
-		tName := fmt.Sprintf("%s,%v", c.md, c.p)
+	for i, c := range cases {
+		tName := fmt.Sprintf("%v: %s,%v", i, c.md, c.p)
 		t.Run(tName, func(t *testing.T) {
-			actual := string(replaceVars(c.md, c.p))
-			expect := string(c.expect)
-			if actual != expect {
-				t.Errorf("Expected: %s, actual: %s", expect, actual)
+			actualB, err := runTemplate(c.md, c.p)
+
+			if c.expectErr && err == nil {
+				t.Errorf("%s: should have had error", tName)
+			} else if !c.expectErr {
+				expect := string(c.expect)
+				actual := string(actualB)
+				if actual != expect {
+					t.Errorf("Expected: %s, actual: %s", expect, actual)
+				}
 			}
 		})
 	}

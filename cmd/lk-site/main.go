@@ -13,7 +13,10 @@ func main() {
 	utils.Clean("build")
 	config := config.ReadConfig("configs/config.yml")
 	md := utils.ReadFile("assets/index.md")
-	md = preprocessor.Run(md, config.Template.Params)
+	md, err := preprocessor.Run(md, config.Template.Params)
+	if err != nil {
+		panic(err)
+	}
 	htmlOpts := html.RendererOptions{
 		CSS:   config.Template.Styles.SheetURL,
 		Flags: html.CommonFlags | html.CompletePage,
