@@ -1,5 +1,10 @@
-{.block}
-My name is {{ .myName }} and this is my site.
+### Header0 {.title}
 
-{.block}
-This is {{ .projectName }}.
+{.subtitle}
+Let me know what you think.
+This is simple container within a section
+
+Here is a paragraph. Lorem lipsum.
+
+# Title one {.is-title}
+## Title two
