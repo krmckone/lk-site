@@ -2,21 +2,99 @@ package templater
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"text/template"
 
 	"github.com/krmckone/ksite/internal/config"
+	"github.com/krmckone/ksite/internal/utils"
+	"github.com/yuin/goldmark"
 )
 
-// Run executes main template on md in environment p
-func Run(md []byte, p config.Params) ([]byte, error) {
-	return runTemplate(md, p)
+// BuildSite is for building the site
+func BuildSite(gm goldmark.Markdown, c *config.Config) error {
+	if err := runComponents(gm, c); err != nil {
+		return err
+	}
+
+	if err := runPage(gm, c, "index"); err != nil {
+		return err
+	}
+
+	if err := makePage(gm, c, "index"); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// RunNav executes template for top navbar
-func RunNav(md []byte, p config.Params) ([]byte, error) {
-	return runNavTemplate(md, p)
+func makePage(gm goldmark.Markdown, c *config.Config, name string) error {
+	html, err := runBase(gm, c)
+	if err != nil {
+		return err
+	}
+
+	utils.Mkdir("build")
+	utils.WriteFile(fmt.Sprintf("build/%s.html", name), html)
+
+	return nil
+}
+
+func runComponents(gm goldmark.Markdown, c *config.Config) error {
+	// Do topnav content
+	if err := run(gm, c, "navbar"); err != nil {
+		return err
+	}
+
+	// Do header content
+	if err := run(gm, c, "header"); err != nil {
+		return err
+	}
+
+	// Do footer content
+	if err := run(gm, c, "footer"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func runBase(gm goldmark.Markdown, c *config.Config) ([]byte, error) {
+	basePage := utils.ReadFile("assets/base_page.html")
+	md, err := runTemplate(basePage, c.Template.Params)
+	if err != nil {
+		return md, err
+	}
+	return md, nil
+}
+
+func run(gm goldmark.Markdown, c *config.Config, name string) error {
+	buf := new(bytes.Buffer)
+	md := utils.ReadFile(fmt.Sprintf("assets/%s.md", name))
+	md, err := runTemplate(md, c.Template.Params)
+	if err != nil {
+		return err
+	}
+	if err := gm.Convert(md, buf); err != nil {
+		return err
+	}
+	c.Template.Params[name] = buf.String()
+	return nil
+}
+
+func runPage(gm goldmark.Markdown, c *config.Config, name string) error {
+	buf := new(bytes.Buffer)
+	md := utils.ReadFile(fmt.Sprintf("assets/%s.md", name))
+	md, err := runTemplate(md, c.Template.Params)
+	if err != nil {
+		return err
+	}
+	if err := gm.Convert(md, buf); err != nil {
+		return err
+	}
+	c.Template.Params["main_content"] = buf.String()
+	return nil
 }
 
 func runTemplate(md []byte, p config.Params) ([]byte, error) {
