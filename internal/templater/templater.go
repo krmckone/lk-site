@@ -18,9 +18,20 @@ import (
 
 // Page holds data for templating a page
 type Page struct {
+	Title    string
 	Content  []byte
 	Template []byte
 	Params   map[string]string
+}
+
+func (p Page) String() string {
+	return fmt.Sprintf(
+		"Title: %s\nContent: %s\nTemplate: %s\nParams: %v",
+		p.Title,
+		string(p.Content),
+		string(p.Template),
+		p.Params,
+	)
 }
 
 // BuildSite is for building the site
@@ -36,17 +47,13 @@ func BuildSite() error {
 		return err
 	}
 
-	pages, err := getAssets("assets/pages")
+	pages, err := getPages("assets/pages", c.Template.Params)
 	if err != nil {
 		return err
 	}
 
 	for _, p := range pages {
-		if err := runPage(gm, &c, p); err != nil {
-			return err
-		}
-
-		if err := makePage(gm, &c, p); err != nil {
+		if err := p.exec(gm); err != nil {
 			return err
 		}
 	}
@@ -69,14 +76,25 @@ func newGoldmark() goldmark.Markdown {
 	)
 }
 
-func makePage(gm goldmark.Markdown, c *config.Config, name string) error {
-	html, err := runBaseTemplate(gm, c)
+func (p Page) exec(gm goldmark.Markdown) error {
+
+	mdBuffer := new(bytes.Buffer)
+	if err := gm.Convert(p.Content, mdBuffer); err != nil {
+		return err
+	}
+	p.Params["main_content"] = mdBuffer.String()
+
+	tmpl, err := template.New("template").Parse(string(p.Template))
 	if err != nil {
 		return err
 	}
 
-	utils.WriteFile(fmt.Sprintf("build/%s.html", name), html)
+	templBuffer := new(bytes.Buffer)
+	if err = tmpl.Execute(templBuffer, p.Params); err != nil {
+		return err
+	}
 
+	utils.WriteFile(fmt.Sprintf("build/%s.html", p.Title), templBuffer.Bytes())
 	return nil
 }
 
@@ -99,15 +117,6 @@ func runComponents(gm goldmark.Markdown, c *config.Config) error {
 	return nil
 }
 
-func runBaseTemplate(gm goldmark.Markdown, c *config.Config) ([]byte, error) {
-	basePage := utils.ReadFile("assets/base_page.html")
-	md, err := runTemplate(basePage, c.Template.Params)
-	if err != nil {
-		return md, err
-	}
-	return md, nil
-}
-
 func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) error {
 	buf := new(bytes.Buffer)
 	md := utils.ReadFile(fmt.Sprintf("assets/%s.md", name))
@@ -124,20 +133,6 @@ func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) e
 		return err
 	}
 	c.Template.Params[name] = buf.String()
-	return nil
-}
-
-func runPage(gm goldmark.Markdown, c *config.Config, name string) error {
-	buf := new(bytes.Buffer)
-	md := utils.ReadFile(fmt.Sprintf("assets/pages/%s.md", name))
-	md, err := runTemplate(md, c.Template.Params)
-	if err != nil {
-		return err
-	}
-	if err := gm.Convert(md, buf); err != nil {
-		return err
-	}
-	c.Template.Params["main_content"] = buf.String()
 	return nil
 }
 
@@ -170,7 +165,7 @@ func getAssets(path string) ([]string, error) {
 }
 
 func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
-	funcs := map[string]interface{}{"getAssets": getAssets}
+	funcs := map[string]interface{}{"getAssets": getAssets, "makeTitle": makeTitle}
 	tmpl, err := template.New("topnav").Funcs(funcs).Parse(string(md))
 	if err != nil {
 		return nil, err
@@ -180,4 +175,37 @@ func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
 		return nil, err
 	}
 	return buffer.Bytes(), nil
+}
+
+func getPages(path string, p config.Params) ([]Page, error) {
+	pages := make([]Page, 0)
+	names, err := getAssets(path)
+	if err != nil {
+		return pages, err
+	}
+	// Override the base page template here
+	basePage := utils.ReadFile("assets/base_page.html")
+	for _, name := range names {
+		md := utils.ReadFile(fmt.Sprintf("%s/%s.md", path, name))
+		// Override any params here before making the page
+		page, err := newPage(name, md, basePage, p)
+		if err != nil {
+			return pages, err
+		}
+		pages = append(pages, page)
+	}
+	return pages, nil
+}
+
+func newPage(title string, content []byte, template []byte, params map[string]string) (Page, error) {
+	return Page{
+		title,
+		content,
+		template,
+		params,
+	}, nil
+}
+
+func makeTitle(assetName string) string {
+	return strings.Title(strings.Join(strings.Split(assetName, "_"), " "))
 }

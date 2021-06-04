@@ -1,3 +1,4 @@
 # {{.myName}} {.title}
 # {{.projectName}} {.subtitle}
-Welcome. Thank's for checking out the project.
+Welcome. Thanks for checking out the project. It's currently
+in development.

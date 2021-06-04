@@ -1,4 +1,4 @@
-### Header0 {.title}
+### Header for the Index page {.title}
 
 {.subtitle}
 Let me know what you think.
