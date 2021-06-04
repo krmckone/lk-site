@@ -24,7 +24,7 @@ type Page struct {
 	Params   map[string]string
 }
 
-func (p Page) String() string {
+func (p *Page) String() string {
 	return fmt.Sprintf(
 		"Title: %s\nContent: %s\nTemplate: %s\nParams: %v",
 		p.Title,
@@ -164,8 +164,22 @@ func getAssets(path string) ([]string, error) {
 	return assets, nil
 }
 
+func getAssetsNoAbout(path string) ([]string, error) {
+	assets, err := getAssets(path)
+	if err != nil {
+		return assets, err
+	}
+	result := []string{}
+	for _, asset := range assets {
+		if asset != "about" {
+			result = append(result, asset)
+		}
+	}
+	return result, nil
+}
+
 func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
-	funcs := map[string]interface{}{"getAssets": getAssets, "makeTitle": makeTitle}
+	funcs := map[string]interface{}{"getAssetsNoAbout": getAssetsNoAbout, "makeTitle": makeTitle}
 	tmpl, err := template.New("topnav").Funcs(funcs).Parse(string(md))
 	if err != nil {
 		return nil, err

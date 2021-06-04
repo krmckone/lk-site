@@ -17,15 +17,6 @@
 <body class="is-flex is-flex-direction-column">
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://bulma.io">
-        <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
-      </a>
-
-      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-      </a>
     </div>
 
     <div id="navbarBasicExample" class="navbar-menu">
@@ -36,12 +27,15 @@
 
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link">
-            Pages
+            Posts
           </a>
           <div class="navbar-dropdown">
             {{.topnav}}
           </div>
         </div>
+        <a class="navbar-item" href="about.html">
+          About
+        </a>
       </div>
 
       <div class="navbar-end">
@@ -49,9 +43,9 @@
         </div>
       </div>
   </nav>
-  <div class="hero is-light">
+  <div class="hero is-small is-info">
     <div class="hero-body">
-      <div class="container">
+      <div class="content">
         {{.header}}
       </div>
     </div>
@@ -62,7 +56,9 @@
     <div class="container">
       <div class="columns is-centered">
         <div class="column is-half">
-          {{.main_content}}
+          <div class="content is-normal">
+            {{.main_content}}
+          </div>
         </div>
       </div>
     </div>
