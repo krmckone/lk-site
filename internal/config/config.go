@@ -34,5 +34,6 @@ func ReadConfig(path string) Config {
 	if err != nil {
 		log.Fatal(err)
 	}
+	config.Template.Params["sheetsURL"] = config.Template.Styles.SheetURL
 	return config
 }

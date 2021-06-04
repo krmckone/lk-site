@@ -1,4 +1,4 @@
-package preprocessor
+package templater
 
 import (
 	"fmt"
@@ -114,5 +114,25 @@ func TestReplaceVars(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestMakeTitle(t *testing.T) {
+	cases := []struct {
+		in, expect string
+	}{
+		{
+			"page_0", "Page 0",
+		}, {
+			"page 1", "Page 1",
+		}, {
+			"index_page_zero", "Index Page Zero",
+		},
+	}
+	for _, c := range cases {
+		actual := makeTitle(c.in)
+		if actual != c.expect {
+			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
+		}
 	}
 }

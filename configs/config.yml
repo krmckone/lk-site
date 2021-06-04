@@ -1,5 +1,6 @@
 template:
     params:
+      title: "Kaleb's Site"
       projectName: "A Static Site Generator"
       myName: "Kaleb McKone"
     styles:

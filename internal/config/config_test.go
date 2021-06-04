@@ -26,7 +26,7 @@ template:
     sheetURL: "styles.url"`,
 			Config{
 				TemplateConfig{
-					Params{"projectName": "Hello, World!", "myName": "Tester 0"},
+					Params{"projectName": "Hello, World!", "myName": "Tester 0", "sheetsURL": "styles.url"},
 					StylesParams{SheetURL: "styles.url"},
 				},
 			},
@@ -39,7 +39,7 @@ template:
     yourName: "Name0"`,
 			Config{
 				TemplateConfig{
-					Params{"name": "NoName", "yourName": "Name0"},
+					Params{"name": "NoName", "yourName": "Name0", "sheetsURL": ""},
 					StylesParams{},
 				},
 			},
