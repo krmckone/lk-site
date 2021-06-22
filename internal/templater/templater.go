@@ -121,9 +121,10 @@ func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) e
 	buf := new(bytes.Buffer)
 	md := utils.ReadFile(fmt.Sprintf("assets/%s.md", name))
 	var err error
-	if name == "topnav" {
+	switch name {
+	case "topnav":
 		md, err = runNavTemplate(md, c.Template.Params)
-	} else {
+	default:
 		md, err = runTemplate(md, c.Template.Params)
 	}
 	if err != nil {
@@ -164,14 +165,14 @@ func getAssets(path string) ([]string, error) {
 	return assets, nil
 }
 
-func getAssetsNoAbout(path string) ([]string, error) {
+func getAssetsNoAboutNoHome(path string) ([]string, error) {
 	assets, err := getAssets(path)
 	if err != nil {
 		return assets, err
 	}
 	result := []string{}
 	for _, asset := range assets {
-		if asset != "about" {
+		if asset != "about" && asset != "index" {
 			result = append(result, asset)
 		}
 	}
@@ -179,7 +180,7 @@ func getAssetsNoAbout(path string) ([]string, error) {
 }
 
 func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
-	funcs := map[string]interface{}{"getAssetsNoAbout": getAssetsNoAbout, "makeTitle": makeTitle}
+	funcs := map[string]interface{}{"getAssetsNoAbout": getAssetsNoAboutNoHome, "makeTitle": makeTitle}
 	tmpl, err := template.New("topnav").Funcs(funcs).Parse(string(md))
 	if err != nil {
 		return nil, err
