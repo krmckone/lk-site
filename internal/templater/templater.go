@@ -18,19 +18,21 @@ import (
 
 // Page holds data for templating a page
 type Page struct {
-	Title    string
-	Content  []byte
-	Template []byte
-	Params   map[string]string
+	Title         string
+	Content       []byte
+	Template      []byte
+	Params        map[string]string
+	BuildPathRoot string
 }
 
 func (p *Page) String() string {
 	return fmt.Sprintf(
-		"Title: %s\nContent: %s\nTemplate: %s\nParams: %v",
+		"Title: %s\nContent: %s\nTemplate: %s\nParams: %v\nBuildPathRoot: %s",
 		p.Title,
 		string(p.Content),
 		string(p.Template),
 		p.Params,
+		p.BuildPathRoot,
 	)
 }
 
@@ -47,12 +49,17 @@ func BuildSite() error {
 		return err
 	}
 
-	pages, err := getPages("assets/pages", c.Template.Params)
+	basePages, err := getPages("assets/pages", c.Template.Params, "/")
 	if err != nil {
 		return err
 	}
 
-	for _, p := range pages {
+	posts, err := getPages("assets/pages/posts", c.Template.Params, "/posts")
+	if err != nil {
+		return err
+	}
+
+	for _, p := range append(basePages, posts...) {
 		if err := p.exec(gm); err != nil {
 			return err
 		}
@@ -77,7 +84,6 @@ func newGoldmark() goldmark.Markdown {
 }
 
 func (p Page) exec(gm goldmark.Markdown) error {
-
 	mdBuffer := new(bytes.Buffer)
 	if err := gm.Convert(p.Content, mdBuffer); err != nil {
 		return err
@@ -94,7 +100,10 @@ func (p Page) exec(gm goldmark.Markdown) error {
 		return err
 	}
 
-	utils.WriteFile(fmt.Sprintf("build/%s.html", p.Title), templBuffer.Bytes())
+	pathRoot := fmt.Sprintf("build/%s", p.BuildPathRoot)
+	os.MkdirAll(pathRoot, 0700)
+	utils.WriteFile(fmt.Sprintf("%s/%s.html", pathRoot, p.Title), templBuffer.Bytes())
+
 	return nil
 }
 
@@ -119,8 +128,10 @@ func runComponents(gm goldmark.Markdown, c *config.Config) error {
 
 func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) error {
 	buf := new(bytes.Buffer)
-	md := utils.ReadFile(fmt.Sprintf("assets/%s.md", name))
+	md := utils.ReadFile(fmt.Sprintf("assets/components/%s.md", name))
+
 	var err error
+
 	switch name {
 	case "topnav":
 		md, err = runNavTemplate(md, c.Template.Params)
@@ -134,6 +145,7 @@ func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) e
 		return err
 	}
 	c.Template.Params[name] = buf.String()
+
 	return nil
 }
 
@@ -142,85 +154,112 @@ func runTemplate(md []byte, p config.Params) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	buffer := new(bytes.Buffer)
 	if err = tmpl.Execute(buffer, p); err != nil {
 		return nil, err
 	}
+
 	return buffer.Bytes(), nil
 }
 
 func getAssets(path string) ([]string, error) {
 	var assets []string
+
 	dir, err := os.Open(path)
 	if err != nil {
 		return assets, err
 	}
-	assets, err = dir.Readdirnames(0)
+
+	files, err := dir.Readdir(0)
 	if err != nil {
 		return assets, err
 	}
-	for i := range assets {
-		assets[i] = strings.Split(assets[i], ".")[0]
+
+	for i, v := range files {
+		// We only want to treat files as assets here. If there's nested
+		// directories containg more assets, then getAssets needs to get
+		// called with that nested path to handle that case separately
+		if !v.IsDir() {
+			assets = append(assets, strings.Split(files[i].Name(), ".")[0])
+		}
 	}
+
 	return assets, nil
 }
 
-func getAssetsNoAboutNoHome(path string) ([]string, error) {
+func makeHrefs(path string) ([]string, error) {
+	var hrefs []string
+
 	assets, err := getAssets(path)
 	if err != nil {
-		return assets, err
+		return hrefs, err
 	}
-	result := []string{}
-	for _, asset := range assets {
-		if asset != "about" && asset != "index" {
-			result = append(result, asset)
-		}
+
+	for _, v := range assets {
+		hrefs = append(hrefs, makeHref(v, path))
 	}
-	return result, nil
+
+	return hrefs, nil
+}
+
+func makeHref(assetName, originalPath string) string {
+	pathSplit := strings.Split(originalPath, "/")
+	hrefRoot := pathSplit[len(pathSplit)-1]
+
+	return fmt.Sprintf("/%s/%s", hrefRoot, assetName)
 }
 
 func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
-	funcs := map[string]interface{}{"getAssetsNoAbout": getAssetsNoAboutNoHome, "makeTitle": makeTitle}
+	funcs := map[string]interface{}{"makeHrefs": makeHrefs, "makeNavTitle": makeNavTitleFromHref}
 	tmpl, err := template.New("topnav").Funcs(funcs).Parse(string(md))
 	if err != nil {
 		return nil, err
 	}
+
 	buffer := new(bytes.Buffer)
+
 	if err = tmpl.Execute(buffer, p); err != nil {
 		return nil, err
 	}
+
 	return buffer.Bytes(), nil
 }
 
-func getPages(path string, p config.Params) ([]Page, error) {
+func getPages(path string, p config.Params, buildPathRoot string) ([]Page, error) {
 	pages := make([]Page, 0)
+
 	names, err := getAssets(path)
 	if err != nil {
 		return pages, err
 	}
+
 	// Override the base page template here
 	basePage := utils.ReadFile("assets/base_page.html")
 	for _, name := range names {
 		md := utils.ReadFile(fmt.Sprintf("%s/%s.md", path, name))
 		// Override any params here before making the page
-		page, err := newPage(name, md, basePage, p)
+		page, err := newPage(name, md, basePage, p, buildPathRoot)
 		if err != nil {
 			return pages, err
 		}
 		pages = append(pages, page)
 	}
+
 	return pages, nil
 }
 
-func newPage(title string, content []byte, template []byte, params map[string]string) (Page, error) {
+func newPage(title string, content []byte, template []byte, params map[string]string, buildPathRoot string) (Page, error) {
 	return Page{
 		title,
 		content,
 		template,
 		params,
+		buildPathRoot,
 	}, nil
 }
 
-func makeTitle(assetName string) string {
-	return strings.Title(strings.Join(strings.Split(assetName, "_"), " "))
+func makeNavTitleFromHref(assetHref string) string {
+	pathSplit := strings.Split(assetHref, "/")
+	return strings.Title(strings.Join(strings.Split(pathSplit[len(pathSplit)-1], "_"), " "))
 }

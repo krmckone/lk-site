@@ -117,20 +117,42 @@ func TestReplaceVars(t *testing.T) {
 	}
 }
 
-func TestMakeTitle(t *testing.T) {
+func TestMakeNavTitleFromHref(t *testing.T) {
 	cases := []struct {
 		in, expect string
 	}{
 		{
-			"page_0", "Page 0",
+			"posts/page_0", "Page 0",
 		}, {
-			"page 1", "Page 1",
+			"posts/page 1", "Page 1",
 		}, {
 			"index_page_zero", "Index Page Zero",
 		},
 	}
 	for _, c := range cases {
-		actual := makeTitle(c.in)
+		actual := makeNavTitleFromHref(c.in)
+		if actual != c.expect {
+			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
+		}
+	}
+}
+
+func TestMakeHref(t *testing.T) {
+	cases := []struct {
+		assetName, originalPath, expect string
+	}{
+		{
+			"testing_1_2_3", "test/posts", "/posts/testing_1_2_3",
+		},
+		{
+			"file_name", "test123/xyz", "/xyz/file_name",
+		},
+		{
+			"index", "website/test123/files", "/files/index",
+		},
+	}
+	for _, c := range cases {
+		actual := makeHref(c.assetName, c.originalPath)
 		if actual != c.expect {
 			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
 		}
