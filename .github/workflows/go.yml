@@ -62,6 +62,8 @@ jobs:
     - name: Check out code at the deploy location
       uses: actions/checkout@v2
       with:
+        token: ${{ secrets.GH_PAT }}
+      with:
         repository: 'krmckone/krm-site'
     - name: deploy
       shell: bash
