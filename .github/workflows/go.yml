@@ -60,8 +60,8 @@ jobs:
         name: site
     - name: Check out code at the deploy location
       uses: actions/checkout@v2
-        with:
-          repository: 'krm-site'
+      with:
+        repository: 'krm-site'
     - name: deploy
       shell: bash
       env:
