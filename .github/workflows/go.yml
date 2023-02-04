@@ -53,6 +53,8 @@ jobs:
     name: Deploy Static Site
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      pull-requests: write
     steps:
     - name: Download Static Site
       uses: actions/download-artifact@v3
@@ -74,7 +76,7 @@ jobs:
         git config --global user.email "20476319+krmckone@users.noreply.github.com"
         git checkout -b "lk-site-deploy-${{ github.ref_name  }}"
         ls ~/site
-        cp -r ~/site ./
+        cp -r ~/site/ ./
         git add .
         git commit -m "New release"
         git push origin HEAD
