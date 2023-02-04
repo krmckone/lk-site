@@ -49,6 +49,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        git --version
+        git config user.name "Kaleb's GitHub Actions Bot from lk-site"
+        git config user.email "kmckone1825@gmail.com"
         gh repo clone https://github.com/krmckone/krm-site.git
         cd krm-site
         git checkout -b "lk-site-deploy-${{ github.ref_name  }}"
