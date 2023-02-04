@@ -1,13 +1,10 @@
-name: Go
+name: Deploy
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -78,5 +75,5 @@ jobs:
         git add .
         git commit -m "New release"
         git push origin HEAD
-        gh pr create --title "New Pull Request" --body "Testing 123"
+        gh pr create --title "Automatic pull request $(date +%m-%d-%y-%H:%M:%S)" --body "This pull request was automatically created"
 
