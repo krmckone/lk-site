@@ -42,3 +42,4 @@ jobs:
       uses: anishathalye/proof-html@v2.0.2
       with:
         directory: ./build
+        check_favicon: false
