@@ -34,3 +34,11 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    - name: Build Static
+      run: go run cmd/lk-site/main.go
+    
+    - name: Check HTML
+      uses: anishathalye/proof-html@v2.0.2
+      with:
+        directory: ./build
