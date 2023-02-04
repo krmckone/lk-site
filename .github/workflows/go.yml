@@ -69,7 +69,7 @@ jobs:
     - name: deploy
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
       run: |
         git --version
         git config --global user.name "Kaleb's GitHub Actions Bot from lk-site"
