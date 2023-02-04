@@ -58,7 +58,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: site
-        path: $GITHUB_WORKSPACE/site
+        path: ~/site
     - name: Check out code at the deploy location
       uses: actions/checkout@v2
       with:
@@ -72,8 +72,8 @@ jobs:
         git config --global user.name "Kaleb's GitHub Actions Bot from lk-site"
         git config --global user.email "kmckone1825@gmail.com"
         git checkout -b "lk-site-deploy-${{ github.ref_name  }}"
-        ls $GITHUB_WORKSPACE
-        cp -r $GITHUB_WORKSPACE/site ./
+        ls ~/site
+        cp -r ~/site ./
         git add .
         git commit -m "New release"
         git push origin HEAD
