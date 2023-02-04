@@ -46,5 +46,7 @@ jobs:
     
     - name: Deploy Static Site
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "TESTING THIS RUNS"
+        gh repo clone https://github.com/krmckone/krm-site.git
