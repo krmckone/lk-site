@@ -47,7 +47,7 @@ jobs:
     - name: Deploy Static Site
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         git --version
         git config --global user.name "Kaleb's GitHub Actions Bot from lk-site"
@@ -58,6 +58,6 @@ jobs:
         cp -r ../build/* ./
         git add .
         git commit -m "New release"
-        git push -u https://$GITHUB_TOKEN@github.com/krmckone/lk-site HEAD
+        git push -u https://$GH_TOKEN@github.com/krmckone/lk-site HEAD
         gh pr create --title "New Pull Request" --body "Testing 123"
 
