@@ -71,7 +71,8 @@ jobs:
         git config --global user.name "Kaleb's GitHub Actions Bot from lk-site"
         git config --global user.email "kmckone1825@gmail.com"
         git checkout -b "lk-site-deploy-${{ github.ref_name  }}"
-        cp -r ../site ./
+        ls
+        # cp -r ./site ./
         git add .
         git commit -m "New release"
         git push origin HEAD
