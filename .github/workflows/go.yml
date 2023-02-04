@@ -58,5 +58,6 @@ jobs:
         cp -r ../build/* ./
         git add .
         git commit -m "New release"
+        git push -u origin HEAD
         gh pr create --title "New Pull Request" --body "Testing 123"
 
