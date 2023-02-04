@@ -52,7 +52,7 @@ jobs:
         gh repo clone https://github.com/krmckone/krm-site.git
         cd krm-site
         git checkout -b "lk-site-deploy-${{ github.ref_name  }}"
-        cp ../build/* ./
+        cp -r ../build/* ./
         git add .
         git commit -m "New release"
         gh pr create --title "New Pull Request" --body "Testing 123"
