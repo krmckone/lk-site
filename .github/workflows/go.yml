@@ -43,8 +43,26 @@ jobs:
       with:
         directory: ./build
         check_favicon: false
-    
-    - name: Deploy Static Site
+    - name: Upload Static Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: site
+        path: ./build
+
+  deploy:
+    name: Deploy Static Site
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Download Static Site
+      uses: actions/download-artifact@v3
+      with:
+        name: site
+    - name: Check out code at the deploy location
+      uses: actions/checkout@v2
+        with:
+          repository: 'krm-site'
+    - name: deploy
       shell: bash
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,12 +70,10 @@ jobs:
         git --version
         git config --global user.name "Kaleb's GitHub Actions Bot from lk-site"
         git config --global user.email "kmckone1825@gmail.com"
-        gh repo clone https://github.com/krmckone/krm-site.git
-        cd krm-site
         git checkout -b "lk-site-deploy-${{ github.ref_name  }}"
-        cp -r ../build/* ./
+        cp -r ../site ./
         git add .
         git commit -m "New release"
-        git push -u https://$GITHUB_TOKEN@github.com/krmckone/lk-site HEAD
+        git push origin HEAD
         gh pr create --title "New Pull Request" --body "Testing 123"
 
