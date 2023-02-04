@@ -47,7 +47,7 @@ jobs:
     - name: Deploy Static Site
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git --version
         git config --global user.name "Kaleb's GitHub Actions Bot from lk-site"
