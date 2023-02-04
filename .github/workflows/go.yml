@@ -43,3 +43,8 @@ jobs:
       with:
         directory: ./build
         check_favicon: false
+    
+    - name: Deploy Static Site
+      shell: bash
+      run: |
+        echo "TESTING THIS RUNS"
