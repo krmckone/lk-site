@@ -78,7 +78,7 @@ jobs:
         siteModified=$(git status --porcelain)
         echo $siteModified
         if [ -z $sideModified ]; then
-          echo "No changes to the static site. Existing without asset deployment."
+          echo "No changes to the static site. Exiting without asset deployment."
           exit 0
         fi
         echo "Deploying changes to the static site."
