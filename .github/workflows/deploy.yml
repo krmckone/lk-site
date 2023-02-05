@@ -75,13 +75,15 @@ jobs:
         ls ~/site
         cp -r ~/site/* ./
         git add .
-        commitResult=$(git commit -m "New Release krmckone/lk-site@$lkSiteReleaseHash $releaseDate")
+        referenceLink="krmckone/lk-site@$lkSiteReleaseHash"
+        echo $referenceLink
+        commitResult=$(git commit -m "New Release $referenceLink $releaseDate")
         echo $commitResult $?
         if echo $commitResult | grep "nothing to commit, working tree clean"; then
           echo "No changes to the static site. Existing without asset deployment."
           exit 0
         fi
         git push origin HEAD
-        gh pr create --title "Automatic PR $releaseDate" --body "This pull request was automatically created from ${{ github.server_url }}/krmckone/lk-site/actions/runs/${{ github.run_id }}. This release is based on krmckone/lk-site@$lkSiteReleaseHash"
+        gh pr create --title "Automatic PR $releaseDate" --body "This pull request was automatically created from ${{ github.server_url }}/krmckone/lk-site/actions/runs/${{ github.run_id }}. This release is based on $referenceLink"
         gh pr merge --auto --rebase
 
