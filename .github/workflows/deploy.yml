@@ -77,11 +77,12 @@ jobs:
         cp -r ~/site/* ./
         siteModified=$(git status --porcelain)
         echo $siteModified
-        if [[ -z $sideModified ]]; then
+        if [[ -z $siteModified ]]; then
           echo "No changes to the static site. Exiting without asset deployment."
           exit 0
+        else
+          echo "Deploying changes to the static site."
         fi
-        echo "Deploying changes to the static site."
         git add .
         git commit -m "New Release $referenceLink $releaseDate"
         git push origin HEAD
