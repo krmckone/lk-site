@@ -77,7 +77,7 @@ jobs:
         cp -r ~/site/* ./
         siteModified=$(git status --porcelain)
         echo $siteModified
-        if [ -z $sideModified ]; then
+        if [[ -z $sideModified ]]; then
           echo "No changes to the static site. Exiting without asset deployment."
           exit 0
         fi
