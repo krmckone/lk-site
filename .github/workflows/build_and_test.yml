@@ -1,15 +1,12 @@
-name: Go
+name: Build and Test
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-
   build:
-    name: Build
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
 
@@ -34,3 +31,17 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    - name: Build Static
+      run: go run cmd/lk-site/main.go
+    
+    - name: Check HTML
+      uses: anishathalye/proof-html@v2.0.2
+      with:
+        directory: ./build
+        check_favicon: false
+    - name: Upload Static Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: site
+        path: ./build
