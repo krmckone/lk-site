@@ -1,3 +1,3 @@
 ### About me
 TODO:
-* Update this page
+* Update this page with details
