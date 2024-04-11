@@ -5,6 +5,8 @@ on:
 
 jobs:
   build:
+    outputs:
+      artifact_upload_run_id: ${{ github.run_id }}
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
