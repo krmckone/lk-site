@@ -158,3 +158,29 @@ func TestMakeHref(t *testing.T) {
 		}
 	}
 }
+
+func TestMakeHrefs(t *testing.T) {
+	cases := []struct {
+		path   string
+		expect []string
+	}{
+		{
+			"../../assets/test/pages",
+			[]string{"/pages/post_0", "/pages/post_1", "/pages/post_2"},
+		},
+	}
+	for _, c := range cases {
+		actual, err := makeHrefs(c.path)
+		if err != nil {
+			t.Errorf("Unexpected error: %s", err)
+		}
+		if len(actual) != len(c.expect) {
+			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
+		}
+		for i, v := range c.expect {
+			if v != actual[i] {
+				t.Errorf("Expected: %s, actual: %s", c.expect, actual)
+			}
+		}
+	}
+}

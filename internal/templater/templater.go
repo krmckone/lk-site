@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -196,6 +197,7 @@ func makeHrefs(path string) ([]string, error) {
 		return hrefs, err
 	}
 
+	sort.Strings(assets)
 	for _, v := range assets {
 		hrefs = append(hrefs, makeHref(v, path))
 	}
