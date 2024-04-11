@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"slices"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -200,6 +202,8 @@ func makeHrefs(path string) ([]string, error) {
 		hrefs = append(hrefs, makeHref(v, path))
 	}
 
+	hrefs = sort.StringSlice(hrefs)
+	slices.Reverse(hrefs)
 	return hrefs, nil
 }
 
