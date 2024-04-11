@@ -1,6 +1,6 @@
 module github.com/krmckone/ksite
 
-go 1.15
+go 1.22
 
 require (
 	github.com/go-delve/delve v1.20.1 // indirect
