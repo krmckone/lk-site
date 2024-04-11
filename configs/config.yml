@@ -1,7 +1,7 @@
 template:
-    params:
-      title: "Kaleb McKone"
-      projectName: "Kaleb's Notes"
-      myName: "Kaleb McKone"
-    styles:
-      sheetURL: "https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
+  params:
+    title: "Kaleb McKone"
+    projectName: "Kaleb's Notes"
+    myName: "Kaleb McKone"
+  styles:
+    sheetURL: "https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css"
