@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     outputs:
-      artifact_id: ${{ steps.upload-static-artifacts.outputs.artifact-id }}
+      artifact_upload_run_id: ${{ github.run_id }}
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
