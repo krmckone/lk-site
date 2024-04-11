@@ -5,6 +5,8 @@ on:
 
 jobs:
   build:
+    outputs:
+      artifact_id: ${{ steps.upload-static-artifacts.outputs.artifact-id }}
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
@@ -41,6 +43,7 @@ jobs:
         directory: ./build
         check_favicon: false
     - name: Upload Static Artifacts
+      id: upload-static-artifacts
       uses: actions/upload-artifact@v4
       with:
         name: site
