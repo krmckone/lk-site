@@ -43,7 +43,6 @@ jobs:
         directory: ./build
         check_favicon: false
     - name: Upload Static Artifacts
-      id: upload-static-artifacts
       uses: actions/upload-artifact@v4
       with:
         name: site
