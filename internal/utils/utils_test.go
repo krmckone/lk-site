@@ -3,7 +3,9 @@ package utils
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"testing"
+	"time"
 )
 
 func TestReadFileErr(t *testing.T) {
@@ -44,5 +46,24 @@ func TestClean(t *testing.T) {
 	}
 	if _, err := os.Stat(expectPath); !os.IsNotExist(err) {
 		t.Errorf("Expected %s to not exist and it does", expectPath)
+	}
+}
+
+func TestGetCurrentEasternTime(t *testing.T) {
+	location, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		t.Errorf("Error in setting up location: %s", err)
+	}
+	expected := time.Now().In(location).Format(time.RFC822)
+	actual := GetCurrentEasternTime()
+	if expected != actual {
+		t.Errorf("Expected: %s, got: %s", expected, actual)
+	}
+}
+func TestGetCurrentYear(t *testing.T) {
+	expected := strconv.Itoa(time.Now().Year())
+	actual := GetCurrentYear()
+	if expected != actual {
+		t.Errorf("Expected: %s, got :%s", expected, actual)
 	}
 }
