@@ -2,7 +2,9 @@ package templater
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/krmckone/ksite/internal/config"
 )
@@ -96,6 +98,13 @@ func TestReplaceVars(t *testing.T) {
 			[]byte("{{ .firstPart }}{{ .lastPart }}, {{.myName}}. Welcome to {{ .projN }}"),
 			config.Params{"firstPart": "Hel", "lastPart": "lo", "myName": "Kaleb", "projN": "Testing"},
 			[]byte("Hello, Kaleb. Welcome to Testing"),
+			false,
+		},
+		// 12
+		{
+			[]byte("The current year is {{ .currentYear }}"),
+			config.Params{"currentYear": strconv.Itoa(time.Now().Year())},
+			[]byte(fmt.Sprintf("The current year is %s", strconv.Itoa(time.Now().Year()))),
 			false,
 		},
 	}

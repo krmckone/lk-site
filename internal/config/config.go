@@ -34,6 +34,10 @@ func ReadConfig(path string) Config {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// TODO: Pull out this logic into a helper
 	config.Template.Params["sheetsURL"] = config.Template.Styles.SheetURL
+	config.Template.Params["currentYear"] = utils.GetCurrentYear()
+	config.Template.Params["currentEasternTime"] = utils.GetCurrentEasternTime()
 	return config
 }

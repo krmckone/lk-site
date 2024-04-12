@@ -26,7 +26,13 @@ template:
     sheetURL: "styles.url"`,
 			Config{
 				TemplateConfig{
-					Params{"projectName": "Hello, World!", "myName": "Tester 0", "sheetsURL": "styles.url"},
+					Params{
+						"projectName":        "Hello, World!",
+						"myName":             "Tester 0",
+						"sheetsURL":          "styles.url",
+						"currentYear":        utils.GetCurrentYear(),
+						"currentEasternTime": utils.GetCurrentEasternTime(),
+					},
 					StylesParams{SheetURL: "styles.url"},
 				},
 			},
@@ -39,7 +45,13 @@ template:
     yourName: "Name0"`,
 			Config{
 				TemplateConfig{
-					Params{"name": "NoName", "yourName": "Name0", "sheetsURL": ""},
+					Params{
+						"name":               "NoName",
+						"yourName":           "Name0",
+						"sheetsURL":          "",
+						"currentYear":        utils.GetCurrentYear(),
+						"currentEasternTime": utils.GetCurrentEasternTime(),
+					},
 					StylesParams{},
 				},
 			},
