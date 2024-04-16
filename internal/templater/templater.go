@@ -16,6 +16,7 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // Page holds data for templating a page
@@ -264,5 +265,8 @@ func newPage(title string, content []byte, template []byte, params map[string]st
 
 func makeNavTitleFromHref(assetHref string) string {
 	pathSplit := strings.Split(assetHref, "/")
-	return cases.Title(strings.Join(strings.Split(pathSplit[len(pathSplit)-1], "_"), " "))
+	caser := cases.Title(language.AmericanEnglish)
+	return caser.String(
+		strings.Join(strings.Split(pathSplit[len(pathSplit)-1], "_"), " "),
+	)
 }
