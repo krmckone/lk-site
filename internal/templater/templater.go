@@ -77,7 +77,7 @@ func newGoldmark() goldmark.Markdown {
 		goldmark.WithExtensions(extension.GFM),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
-			parser.WithAttribute(),
+			parser.WithAttribute(), // Lets you use {.att } syntax to add attributes to HTML output
 		),
 		goldmark.WithRendererOptions(
 			html.WithHardWraps(),

@@ -23,12 +23,10 @@ func WriteFile(path string, b []byte) {
 	}
 }
 
-// Mkdir wrapper for os.Mkdir
+// Mkdir wrapper for os.MkdirAll
 func Mkdir(path string) {
-	if err := os.Mkdir(path, 0755); err != nil {
-		if !os.IsNotExist(err) {
-			log.Fatal(err)
-		}
+	if err := os.MkdirAll(path, 0755); err != nil {
+		log.Fatal(err)
 	}
 }
 
