@@ -11,6 +11,7 @@ My favorite math book, which is also free online:
 * https://gamemath.com/book/
 
 Other great sources that I've been pulling together that I want to leverage on my learning path:
+* https://paroj.github.io/gltut/index.html
 * https://chortle.ccsu.edu/vectorlessons/vectorindex.html
 * https://learnopengl.com/
 * https://www.scratchapixel.com/
