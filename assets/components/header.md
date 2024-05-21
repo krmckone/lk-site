@@ -1,3 +1,12 @@
 # {{.myName}} {.title}
 #### {{.projectName}} {.subtitle}
-Hey, thanks for checking out the project. It's currently in development. I'll be making posts soon.
+<div class="columns">
+<aside class="menu column is-one-fifth">
+  <p class="menu-label">Categories</p>
+  <ul class="menu-list">
+    <li class="has-background-info"><a>Posts</a></li>
+    <li><a href="/images.html">Images</a></li>
+    <li><a href="/images/resume/resume.pdf">Resume</a></li>
+  </ul>
+</aside>
+</div>

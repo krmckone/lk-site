@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"strconv"
 	"testing"
 	"time"
@@ -66,4 +67,36 @@ func TestGetCurrentYear(t *testing.T) {
 	if expected != actual {
 		t.Errorf("Expected: %s, got :%s", expected, actual)
 	}
+}
+
+func TestCopyFiles(t *testing.T) {
+	dstPath := "build/test_path"
+	srcPath := "../../assets/test"
+
+	if _, err := os.Stat(dstPath); !os.IsNotExist(err) {
+		t.Errorf("Expected %s to not exist and it does", dstPath)
+	}
+	Mkdir(dstPath)
+	CopyFiles(srcPath, dstPath)
+	dir, err := os.ReadDir(dstPath)
+	if err != nil {
+		t.Errorf("Unable to read dir %s", dstPath)
+	}
+	if len(dir) != 1 {
+		t.Errorf("Unexpected entry in dir %s", dstPath)
+	}
+	nested := fmt.Sprintf("%s/%s", dstPath, dir[0].Name())
+	nestedDir, err := os.ReadDir(nested)
+	if err != nil {
+		t.Errorf("Unable to read dir %s", nested)
+	}
+	expected := []string{"post_0.md", "post_1.md", "post_2.md"}
+	actual := []string{}
+	for _, file := range nestedDir {
+		actual = append(actual, file.Name())
+	}
+	if !reflect.DeepEqual(expected, actual) {
+		t.Errorf("expected: %s, actual: %s", expected, actual)
+	}
+	Clean(dstPath)
 }
