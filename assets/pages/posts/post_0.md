@@ -15,7 +15,7 @@ Other great sources that I've been pulling together that I want to leverage on m
 * https://chortle.ccsu.edu/vectorlessons/vectorindex.html
 * https://learnopengl.com/
 * https://www.scratchapixel.com/
-* https://graphicscodex.com/app/app.html?
+* https://graphicscodex.com/app/app.html
 * https://github.com/luisdnsantos/awesome-computer-graphics
 * https://github.com/prographon/graphics-developer-roadmap
 * https://pbr-book.org/3ed-2018/contents

@@ -39,10 +39,13 @@ func (p *Page) String() string {
 	)
 }
 
-// BuildSite is for building the site
+// BuildSite is for building the site. This includes templating HTML with markdown and
+// putting images in the expected locations in the output
 func BuildSite() error {
 	utils.Clean("build")
 	utils.Mkdir("build")
+	utils.Mkdir("build/images")
+	utils.CopyFiles("assets/images", "build/images")
 
 	gm := newGoldmark()
 

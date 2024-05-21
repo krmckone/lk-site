@@ -1,11 +1,5 @@
-### Posts
+### Hi, welcome to my site.
 
-TODO: Autogenerate some sort of groups/links to posts
+I'm Kaleb McKone and I'm a full time software engineer. This site is home to my posts, where I talk about various topics, and renderings that I have produced as I learn computer graphics. Click around and see what you find.
 
-### Renderings
-
-TODO: Link to renderings/images from current work
-
-### Links
-
-TODO: Any important links
+Check out the <a href="/about.html">about</a> page to find out more about how this site works.
