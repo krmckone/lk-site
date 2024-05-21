@@ -5,7 +5,7 @@
   <p class="menu-label">Categories</p>
   <ul class="menu-list">
     <li class="has-background-info"><a>Posts</a></li>
-    <li><a href="/images.html">Images</a></li>
+    <li><a href="/index.html">Images</a></li>
     <li><a href="/images/resume/resume.pdf">Resume</a></li>
   </ul>
 </aside>
