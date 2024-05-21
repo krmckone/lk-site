@@ -60,7 +60,6 @@ func CopyFiles(srcPath, dstPath string) {
 		log.Fatal(err)
 	}
 	for _, entry := range entries {
-		fmt.Printf("%s/%s\n", srcPath, entry.Name())
 		if !entry.Type().IsDir() {
 			copyFile(
 				fmt.Sprintf("%s/%s", srcPath, entry.Name()),
