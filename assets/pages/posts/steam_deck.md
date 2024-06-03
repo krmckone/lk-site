@@ -8,7 +8,7 @@ I first received my Steam Deck LCD 256GB in July of 2022. I had been waiting for
 
 ![account info](../images/steam_deck/account_info.png "Account Listing")
 
-![shipping info](../images/steam_deck/shipping_info.png "Account Listing")
+![shipping info](../images/steam_deck/shipping_info.png "Shipping Info")
 
 In summer of 2022 I was excited to get the steam deck for a few reasons. Since the Deck's announcement the year prior, I figured that having most of my Steam library available on a handheld would be a huge game changer and I'll get into why that is later. In addition to games, it was just a little linux machine that made it easy to get to the regular linux desktop. It has a separate dock that you can plug your USB devices and monitor into. Even if I'm not one to hack away at linux all day, I think it's really good that a reliable and easy to use Linux device is now so easy get your hands on. On the controls front, the track pads were an improvement over the steam controller's that came out around 2015 and the back paddles added additional function while letting you keep your thumbs on the track pads or sticks. The LCD screen at the time was honestly not something I considered either good or bad, however, the later OLED version that we'll get into is a clear improvement over the first iteration's. I'll mention this more than once, but I work at the computer for multiple hours at a time during the day. Sometimes the last thing I want to do at the end of a work day is continue to sit at my desk and play PC games. Even though I really enjoy gaming on my desktop with a 7900 XT and 170Hz monitor, one can only ensure so many hours looking at the same screen in the same room in the same chair per day.
 
@@ -50,14 +50,26 @@ Not all of the bullet points above should be weighed the same, but games that I 
 
 ### Why did I get an OLED
 
-I was able to list my dislikes about the LCD around the screen and weight because the OLED was able to bring obvious improvements to those areas. Without the OLED the comparison would not be possible. I've seen quite a few reviews call the OLED a side-grade of the LCD and say that if you already own an LCD you do not necessarily need to purchase an OLED.
+![OLED shipping info](../images/steam_deck/oled_shipping_info.png "OLED Shipping Info")
 
-In my opinion the OLED is an upgrade in its own right. For Christmas of 2023 I purchased my wife an OLED version so we could play co-op games from the couch. When it arrived in late November I eagerly opened the package and felt the difference. Stats wise the weight difference between LCD and OLED is not massive however this small difference in weight makes a big difference in prolonged play sessions. My wrists can still fall asleep when playing with poor "wrist/arm" posture, but overall I am very pleased with the perceived decrease in weight on the OLED.
+For Christmas 2023 I got my wife an OLED version so we could play co-op games together on the couch. Since I was too excited to let my wife open it up herself, I broke into the package in early December to turn it on for the first time. I was surprised with the difference in weight and improvement in screen. However, I was still on the fence about upgrading my LCD. It only took 6 months for my jealousy to boil over after watching my wife play her OLED while I still used my LCD. In May 2024 I sold my LCD on Facebook marketplace for $260 and ordered an OLED 512GB.
 
-The screen is also a big upgrade in itself. The colors are much nice and I can perceive the difference in brightness settings much better compared to the LCD. I don't known a Switch OLED but I imagine the difference in those units' screens are similar enough.
-
-I find the physical feedback on the track pads much better on the OLED. At the time of writing I'm not sure if they used different track pads for OLED but compared to my old LCD I enjoy using them much better.
-
-Overall I also just like the color scheme better on the OLED. The all-black joysticks are sharp and the subtle orange power button is also sick.
+Basically, jealousy.
 
 ### Should you get an OLED Steam Deck or LCD?
+
+Some people online have been saying the OLED is at most a side-grade to the LCD.
+
+In my opinion the OLED is an upgrade in its own right. I am very pleased with the perceived decrease in weight on the OLED and I notice the difference over longer play sessions. If you already have an LCD and enjoy it then I would say stick with it, but I personally wanted the better screen and reduced weight. The improved Wifi and battery are also nice additions.
+
+* The screen is also a big upgrade in itself
+  * Colors are much nice and I can perceive the difference in brightness settings much better compared to the LCD
+  * I don't own a Switch OLED but I imagine the difference in those units' screens are similar enough
+* I find the physical feedback on the track pads much better on the OLED
+  * At the time of writing I'm not sure if they used different track pads for OLED but compared to my old LCD I enjoy using them much better.
+* Overall I also just like the color scheme better on the OLED
+  * The all-black joysticks are sharp and the subtle orange power button is also sick.
+
+![steam deck OLED](../images/steam_deck/oled.jpg "Steam Deck OLED")
+
+I was able to list my dislikes about the LCD around the screen and weight because the OLED was able to bring obvious improvements to those areas. Without the OLED the comparison would not be possible.
