@@ -42,7 +42,6 @@ jobs:
         directory: ./build
         check_favicon: false
         ignore_url: |
-          # Linkedin returns 999 to proof-html for some reason
           https://linkedin.com/in/krmckone
     - name: Upload Static Artifacts
       uses: actions/upload-artifact@v4
