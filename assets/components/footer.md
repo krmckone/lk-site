@@ -6,7 +6,6 @@ Last updated {{.currentEasternTime}}
   <a href="https://linkedin.com/in/krmckone" target="_blank" rel="noopener noreferrer">
     {{ .linkedinIcon }}
   </a>
-  </img>
   <a href="https://github.com/krmckone/lk-site" target="_blank" rel="noopener noreferrer">
     {{ .githubIcon }}
   </a>
