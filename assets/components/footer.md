@@ -4,10 +4,10 @@ Last updated {{.currentEasternTime}}
 
 <div>
   <a href="https://linkedin.com/in/krmckone" target="_blank" rel="noopener noreferrer">
-    <img src="../icons/linkedin.svg">
+    {{ .linkedinIcon }}
   </a>
   </img>
   <a href="https://github.com/krmckone/lk-site" target="_blank" rel="noopener noreferrer">
-    <img src="../icons/github.svg"></img>
+    {{ .githubIcon }}
   </a>
 </div>

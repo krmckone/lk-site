@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/krmckone/ksite/internal/utils"
@@ -35,9 +36,22 @@ func ReadConfig(path string) Config {
 		log.Fatal(err)
 	}
 
-	// TODO: Pull out this logic into a helper
+	config.Template.Params["githubIcon"] = ReadGitHubIcon()
+	config.Template.Params["linkedinIcon"] = ReadLinkedInIcon()
 	config.Template.Params["sheetsURL"] = config.Template.Styles.SheetURL
 	config.Template.Params["currentYear"] = utils.GetCurrentYear()
 	config.Template.Params["currentEasternTime"] = utils.GetCurrentEasternTime()
 	return config
+}
+
+func ReadGitHubIcon() string {
+	return readIcon("github.svg")
+}
+
+func ReadLinkedInIcon() string {
+	return readIcon("linkedin.svg")
+}
+
+func readIcon(name string) string {
+	return string(utils.ReadFile(fmt.Sprintf("assets/icons/%s", name)))
 }

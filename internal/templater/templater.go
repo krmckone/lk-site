@@ -47,11 +47,9 @@ func BuildSite() error {
 	utils.Mkdir("build/images")
 	utils.Mkdir("build/js")
 	utils.Mkdir("build/shaders")
-	utils.Mkdir("build/icons")
 	utils.CopyFiles("assets/images", "build/images")
 	utils.CopyFiles("assets/js", "build/js")
 	utils.CopyFiles("assets/shaders", "build/shaders")
-	utils.CopyFiles("assets/icons", "build/icons")
 
 	gm := newGoldmark()
 
