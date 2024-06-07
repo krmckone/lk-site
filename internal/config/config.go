@@ -16,6 +16,7 @@ type Config struct {
 // TemplateConfig config for the html templating
 type TemplateConfig struct {
 	Params Params       `yaml:"params"`
+	Icons  Params       `yaml:"icons"`
 	Styles StylesParams `yaml:"styles"`
 }
 
@@ -36,8 +37,7 @@ func ReadConfig(path string) Config {
 		log.Fatal(err)
 	}
 
-	config.Template.Params["githubIcon"] = ReadGitHubIcon()
-	config.Template.Params["linkedinIcon"] = ReadLinkedInIcon()
+	ReadIcons(&config)
 	config.Template.Params["sheetsURL"] = config.Template.Styles.SheetURL
 	config.Template.Params["currentYear"] = utils.GetCurrentYear()
 	config.Template.Params["currentEasternTime"] = utils.GetCurrentEasternTime()
@@ -50,6 +50,12 @@ func ReadGitHubIcon() string {
 
 func ReadLinkedInIcon() string {
 	return readIcon("linkedin.svg")
+}
+
+func ReadIcons(config *Config) {
+	for name, path := range config.Template.Icons {
+		config.Template.Params[fmt.Sprintf("%sIcon", name)] = readIcon(path)
+	}
 }
 
 func readIcon(name string) string {
