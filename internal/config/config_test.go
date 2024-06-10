@@ -23,7 +23,10 @@ template:
     projectName: "Hello, World!"
     myName: "Tester 0"
   styles:
-    sheetURL: "styles.url"`,
+    sheetURL: "styles.url"
+  icons:
+    github: github.svg
+    linkedin: linkedin.svg`,
 			Config{
 				TemplateConfig{
 					Params{
@@ -32,8 +35,12 @@ template:
 						"sheetsURL":          "styles.url",
 						"currentYear":        utils.GetCurrentYear(),
 						"currentEasternTime": utils.GetCurrentEasternTime(),
-						"githubIcon":         ReadGitHubIcon(),
-						"linkedinIcon":       ReadLinkedInIcon(),
+						"githubIcon":         "",
+						"linkedinIcon":       "",
+					},
+					Params{
+						"github":   "github.svg",
+						"linkedin": "linkedin.svg",
 					},
 					StylesParams{SheetURL: "styles.url"},
 				},
@@ -53,9 +60,8 @@ template:
 						"sheetsURL":          "",
 						"currentYear":        utils.GetCurrentYear(),
 						"currentEasternTime": utils.GetCurrentEasternTime(),
-						"githubIcon":         ReadGitHubIcon(),
-						"linkedinIcon":       ReadLinkedInIcon(),
 					},
+					nil,
 					StylesParams{},
 				},
 			},
