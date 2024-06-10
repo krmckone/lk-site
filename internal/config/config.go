@@ -44,14 +44,6 @@ func ReadConfig(path string) Config {
 	return config
 }
 
-func ReadGitHubIcon() string {
-	return readIcon("github.svg")
-}
-
-func ReadLinkedInIcon() string {
-	return readIcon("linkedin.svg")
-}
-
 func ReadIcons(config *Config) {
 	for name, path := range config.Template.Icons {
 		config.Template.Params[fmt.Sprintf("%sIcon", name)] = readIcon(path)

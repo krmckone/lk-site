@@ -61,7 +61,7 @@ template:
 						"currentYear":        utils.GetCurrentYear(),
 						"currentEasternTime": utils.GetCurrentEasternTime(),
 					},
-					Params{},
+					nil,
 					StylesParams{},
 				},
 			},
