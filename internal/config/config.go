@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"log"
+	"path/filepath"
+	"runtime"
 
 	"github.com/krmckone/ksite/internal/utils"
 	"gopkg.in/yaml.v2"
@@ -37,19 +39,22 @@ func ReadConfig(path string) Config {
 		log.Fatal(err)
 	}
 
-	ReadIcons(&config)
+	config = ReadIcons(config)
 	config.Template.Params["sheetsURL"] = config.Template.Styles.SheetURL
 	config.Template.Params["currentYear"] = utils.GetCurrentYear()
 	config.Template.Params["currentEasternTime"] = utils.GetCurrentEasternTime()
 	return config
 }
 
-func ReadIcons(config *Config) {
+func ReadIcons(config Config) Config {
 	for name, path := range config.Template.Icons {
 		config.Template.Params[fmt.Sprintf("%sIcon", name)] = readIcon(path)
 	}
+	return config
 }
 
 func readIcon(name string) string {
-	return string(utils.ReadFile(fmt.Sprintf("assets/icons/%s", name)))
+	_, b, _, _ := runtime.Caller(0)
+	absolutePath := filepath.Dir(b)
+	return string(utils.ReadFile(fmt.Sprintf("%s/../../assets/icons/%s", absolutePath, name)))
 }

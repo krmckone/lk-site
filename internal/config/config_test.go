@@ -35,8 +35,8 @@ template:
 						"sheetsURL":          "styles.url",
 						"currentYear":        utils.GetCurrentYear(),
 						"currentEasternTime": utils.GetCurrentEasternTime(),
-						"githubIcon":         "",
-						"linkedinIcon":       "",
+						"githubIcon":         readIcon("github.svg"),
+						"linkedinIcon":       readIcon("linkedin.svg"),
 					},
 					Params{
 						"github":   "github.svg",
@@ -80,5 +80,45 @@ template:
 				utils.Clean("test_config")
 			})
 		})
+	}
+}
+
+func TestReadIcons(t *testing.T) {
+	cases := []struct {
+		config Config
+		expect Config
+	}{
+		{
+			Config{
+				TemplateConfig{
+					Params{},
+					Params{
+						"github":   "github.svg",
+						"linkedin": "linkedin.svg",
+					},
+					StylesParams{},
+				},
+			},
+			Config{
+				TemplateConfig{
+					Params{
+						"githubIcon":   readIcon("github.svg"),
+						"linkedinIcon": readIcon("linkedin.svg"),
+					},
+					Params{
+						"github":   "github.svg",
+						"linkedin": "linkedin.svg",
+					},
+					StylesParams{},
+				},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		actual := ReadIcons(c.config)
+		if !reflect.DeepEqual(actual, c.expect) {
+			t.Errorf("Expected: %v, actual: %v", c.expect, actual)
+		}
 	}
 }
