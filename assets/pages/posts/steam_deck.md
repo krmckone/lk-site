@@ -18,7 +18,7 @@ Games with native linux support work great with no tweaking necessary in general
 
 ![steam deck lcd](../images/steam_deck/steam_deck_lcd.jpg "Steam Deck LCD")
 
-There's lots of open source plugins as well that you can get for your deck, like one that shows you information from the third party ProtonDB for each of your games. Sometimes user-provided data on ProtonDB is more accurate than Valve's internal testing, so this is useful to have handy. The steam deck's native resolution is 1280*800 at 16:10 so games that natively support this resolution will not cause any black bars around the deck's screen.
+There's lots of open source plugins as well that you can get for your deck, like one that shows you information from the third party ProtonDB for each of your games. Sometimes user-provided data on ProtonDB is more accurate than Valve's internal testing, so this is useful to have handy. The steam deck's native resolution is 1280*800 at 16:10 so games that natively support this resolution will not cause any black bars around the deck's screen. As an alternative, you can set the in-game resolution to 1280x720 and use the deck's built in scaling mode to remove the black bars. This comes at the cost of stretching/distoring the image, though.
 
 Here is my summary/generalization for features that should allow the game to play well on Steam Deck:
 
@@ -35,9 +35,80 @@ Here is my summary/generalization for features that should allow the game to pla
 * For multiplayer games, supports a Linux version of any anti-cheat
   * Games that only run under a native Windows environment due to their anti-cheat will not run as expected on Steam Deck
 
+One additional feature of the steam deck that may go overlooked is the support for multiple controllers simultaneously, just like a console. For example, split screen in local-coop games should just work if you connect multiple controllers to the deck. This works great with the steam deck dock plugged into a TV.
+
+##### My favorite games on Steam Deck so far in no particular order
+* [Vampire Survivors](https://store.steampowered.com/app/1794680/Vampire_Survivors/)
+* [Pillars of Eternity](https://store.steampowered.com/app/291650/Pillars_of_Eternity/)
+* [Slay the Spire](https://store.steampowered.com/app/646570/Slay_the_Spire/)
+* [Assassins Creed Origins](https://store.steampowered.com/app/582160/Assassins_Creed_Origins/)
+* [War Thunder](https://store.steampowered.com/app/236390/War_Thunder/)
+* [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/)
+* [Terraria](https://store.steampowered.com/app/105600/Terraria/)
+* [Risk of Rain 2](https://store.steampowered.com/app/632360/Risk_of_Rain_2/)
+* [Melvor Idle](https://store.steampowered.com/app/1267910/Melvor_Idle/)
+* [Thronebreaker](https://store.steampowered.com/app/973760/Thronebreaker_The_Witcher_Tales/)
+* [System Shock Remake](https://store.steampowered.com/app/482400/System_Shock/)
+* [American Truck Simulator](https://store.steampowered.com/app/270880/American_Truck_Simulator/)
+* [Left 4 Dead 2](https://store.steampowered.com/app/550/Left_4_Dead_2/)
+* [Dread Delusion](https://store.steampowered.com/app/1574240/Dread_Delusion/)
+* [The Long Dark](https://store.steampowered.com/app/305620/The_Long_Dark/)
+* [Fallout 3](https://store.steampowered.com/app/22370/Fallout_3_Game_of_the_Year_Edition/)
+* [Dead Cells](https://store.steampowered.com/app/588650/Dead_Cells/)
+* [Darkest Dungeon](https://store.steampowered.com/app/262060/Darkest_Dungeon/)
+* [Balatro](https://store.steampowered.com/app/2379780/Balatro/)
+* [Dave The Diver](https://store.steampowered.com/app/1868140/DAVE_THE_DIVER/)
+* [Halls of Torment](https://store.steampowered.com/app/2218750/Halls_of_Torment/)
+* [No Man's Sky](https://store.steampowered.com/app/275850/No_Mans_Sky/)
+* [Backpack Battles](https://store.steampowered.com/app/2427700/Backpack_Battles/)
+* [The Talos Principle](https://store.steampowered.com/app/257510/The_Talos_Principle/)
+* [Into the Breach](https://store.steampowered.com/app/590380/Into_the_Breach/)
+* [Fable Anniversary](https://store.steampowered.com/app/288470/Fable_Anniversary/)
+* [Nova Drift](https://store.steampowered.com/app/858210/Nova_Drift/)
+* [Fabledom](https://store.steampowered.com/app/1651560/Fabledom/)
+* [Overcooked 2](https://store.steampowered.com/app/728880/Overcooked_2/)
+* [Astroneer](https://store.steampowered.com/app/361420/ASTRONEER/)
+* [Monster Hunter: World](https://store.steampowered.com/app/582010/Monster_Hunter_World/)
+* [Hardspace: Shipbraker](https://store.steampowered.com/app/1161580/Hardspace_Shipbreaker/)
+* [Thronefall](https://store.steampowered.com/app/2239150/Thronefall/)
+* [Dome Keeper](https://store.steampowered.com/app/1637320/Dome_Keeper/)
+* [Jupiter Hell](https://store.steampowered.com/app/811320/Jupiter_Hell/)
+* [Moonlighter](https://store.steampowered.com/app/606150/Moonlighter/)
+* [Patch Quest](https://store.steampowered.com/app/1347970/Patch_Quest/)
+* [Caves of Qud](https://store.steampowered.com/app/333640/Caves_of_Qud/)
+* [Half-Life 2](https://store.steampowered.com/app/220/HalfLife_2/)
+* [Teardown](https://store.steampowered.com/app/1167630/Teardown/)
+* [Hexologic](https://store.steampowered.com/app/785890/Hexologic/)
+* [Bloons TD 6](https://store.steampowered.com/app/960090/Bloons_TD_6/)
+* [Buckshot Roulette](https://store.steampowered.com/app/2835570/Buckshot_Roulette/)
+* [Hero's Hour](https://store.steampowered.com/app/1656780/Heros_Hour/)
+* [Dragon's Dogma](https://store.steampowered.com/app/367500/Dragons_Dogma_Dark_Arisen/)
+* [DotAGE](https://store.steampowered.com/app/638510/dotAGE/)
+* [NFS Heat](https://store.steampowered.com/app/1222680/Need_for_Speed_Heat/)
+* [Binding of Isaac Rebirth](https://store.steampowered.com/app/250900/The_Binding_of_Isaac_Rebirth/)
+* [Mount and Blade: Bannerlord](https://store.steampowered.com/app/261550/Mount__Blade_II_Bannerlord/)
+* [The Room](https://store.steampowered.com/app/288160/The_Room/)
+* [Brotato](https://store.steampowered.com/app/1942280/Brotato/)
+* [Risk of Rain Returns](https://store.steampowered.com/app/1337520/Risk_of_Rain_Returns/)
+* [Return of the Obra Dinn](https://store.steampowered.com/app/653530/Return_of_the_Obra_Dinn/)
+* [Tony Hawk Pro Skater 1+2](https://store.steampowered.com/app/2395210/Tony_Hawks_Pro_Skater_1__2/)
+* [Mini Motorways](https://store.steampowered.com/app/1127500/Mini_Motorways/)
+* [Signalis](https://store.steampowered.com/app/1262350/SIGNALIS/)
+* [Kenshi](https://store.steampowered.com/app/233860/Kenshi/)
+* [Mindustry](https://store.steampowered.com/app/1127400/Mindustry/)
+* [Darkwood](https://store.steampowered.com/app/274520/Darkwood/)
+* [Turing Complete](https://store.steampowered.com/app/1444480/Turing_Complete/)
+* [Garden Story](https://store.steampowered.com/app/1062140/Garden_Story/)
+* [20 Minutes TillDawn](https://store.steampowered.com/app/1966900/20_Minutes_Till_Dawn/)
+* [Bugsnax](https://store.steampowered.com/app/674140/Bugsnax/)
+* [Yes, Your Grace](https://store.steampowered.com/app/1115690/Yes_Your_Grace/)
+* [Undermine](https://store.steampowered.com/app/656350/UnderMine/)
+* [Lawn Mowing Simulator](https://store.steampowered.com/app/1480560/Lawn_Mowing_Simulator/)
+* [Ryse, Son of Rome](https://store.steampowered.com/app/302510/Ryse_Son_of_Rome/)
+
 ### What Kind of Games Do Not Work Well
 
-Not all of the bullet points above should be weighed the same, but games that I enjoy the most on Steam Deck basically meet all of those. Occasionally I will play a game that maybe only supports 16:9 resolutions but that is probably the most minimal of compromises to make. If your game requires a ton of controller configuration mapping or runs poorly performance-wise, that's something that is better played on your more powerful gaming PC with mouse and keyboard.
+Not all of the bullet points above should be given the same weight, but games that I enjoy the most on Steam Deck basically meet all of those. Occasionally I will play a game that maybe only supports 16:9 resolutions but that is probably the most minimal of compromises to make. If your game requires a ton of controller configuration mapping or runs poorly performance-wise, that's something that is better played on your more powerful gaming PC with mouse and keyboard.
 
 ### Things about the LCD that were not my favorite
 
