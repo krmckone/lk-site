@@ -18,7 +18,7 @@ Games with native linux support work great with no tweaking necessary in general
 
 ![steam deck lcd](../images/steam_deck/steam_deck_lcd.jpg "Steam Deck LCD")
 
-There's lots of open source plugins as well that you can get for your deck, like one that shows you information from the third party ProtonDB for each of your games. Sometimes user-provided data on ProtonDB is more accurate than Valve's internal testing, so this is useful to have handy. The steam deck's native resolution is 1280*800 at 16:10 so games that natively support this resolution will not cause any black bars around the deck's screen.
+There's lots of open source plugins as well that you can get for your deck, like one that shows you information from the third party ProtonDB for each of your games. Sometimes user-provided data on ProtonDB is more accurate than Valve's internal testing, so this is useful to have handy. The steam deck's native resolution is 1280*800 at 16:10 so games that natively support this resolution will not cause any black bars around the deck's screen. As an alternative, you can set the in-game resolution to 1280x720 and use the deck's built in scaling mode to remove the black bars. This comes at the cost of stretching/distoring the image, though.
 
 Here is my summary/generalization for features that should allow the game to play well on Steam Deck:
 
@@ -34,6 +34,8 @@ Here is my summary/generalization for features that should allow the game to pla
   * If the game does not have controller support, it should allow key remapping to facilitate a custom community controller configuration
 * For multiplayer games, supports a Linux version of any anti-cheat
   * Games that only run under a native Windows environment due to their anti-cheat will not run as expected on Steam Deck
+
+One additional feature of the steam deck that may go overlooked is the support for multiple controllers simultaneously, just like a console. For example, split screen in local-coop games should just work if you connect multiple controllers to the deck. This works great with the steam deck dock plugged into a TV.
 
 ##### My favorite games on Steam Deck so far in no particular order
 * [Vampire Survivors](https://store.steampowered.com/app/1794680/Vampire_Survivors/)
@@ -106,7 +108,7 @@ Here is my summary/generalization for features that should allow the game to pla
 
 ### What Kind of Games Do Not Work Well
 
-Not all of the bullet points above should be weighed the same, but games that I enjoy the most on Steam Deck basically meet all of those. Occasionally I will play a game that maybe only supports 16:9 resolutions but that is probably the most minimal of compromises to make. If your game requires a ton of controller configuration mapping or runs poorly performance-wise, that's something that is better played on your more powerful gaming PC with mouse and keyboard.
+Not all of the bullet points above should be given the same weight, but games that I enjoy the most on Steam Deck basically meet all of those. Occasionally I will play a game that maybe only supports 16:9 resolutions but that is probably the most minimal of compromises to make. If your game requires a ton of controller configuration mapping or runs poorly performance-wise, that's something that is better played on your more powerful gaming PC with mouse and keyboard.
 
 ### Things about the LCD that were not my favorite
 
