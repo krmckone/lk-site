@@ -54,9 +54,9 @@ func BuildSite() error {
 	gm := newGoldmark()
 
 	c, err := config.ReadConfig("configs/config.yml")
-  if err != nil {
-    return err
-  }
+	if err != nil {
+		return err
+	}
 
 	if err := runComponents(gm, &c); err != nil {
 		return err
