@@ -53,7 +53,10 @@ func BuildSite() error {
 
 	gm := newGoldmark()
 
-	c := config.ReadConfig("configs/config.yml")
+	c, err := config.ReadConfig("configs/config.yml")
+  if err != nil {
+    return err
+  }
 
 	if err := runComponents(gm, &c); err != nil {
 		return err
@@ -138,9 +141,10 @@ func runComponents(gm goldmark.Markdown, c *config.Config) error {
 
 func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) error {
 	buf := new(bytes.Buffer)
-	md := utils.ReadFile(fmt.Sprintf("assets/components/%s.md", name))
-
-	var err error
+	md, err := utils.ReadFile(fmt.Sprintf("assets/components/%s.md", name))
+	if err != nil {
+		return err
+	}
 
 	switch name {
 	case "topnav":
@@ -246,9 +250,15 @@ func getPages(path string, p config.Params, buildPathRoot string) ([]Page, error
 	}
 
 	// Override the base page template here
-	basePage := utils.ReadFile("assets/base_page.html")
+	basePage, err := utils.ReadFile("assets/base_page.html")
+	if err != nil {
+		return pages, err
+	}
 	for _, name := range names {
-		md := utils.ReadFile(fmt.Sprintf("%s/%s.md", path, name))
+		md, err := utils.ReadFile(fmt.Sprintf("%s/%s.md", path, name))
+		if err != nil {
+			return pages, err
+		}
 		// Override any params here before making the page
 		page, err := newPage(name, md, basePage, p, buildPathRoot)
 		if err != nil {

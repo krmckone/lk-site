@@ -10,12 +10,8 @@ import (
 )
 
 // ReadFile wrapper for os.ReadFile
-func ReadFile(path string) []byte {
-	bytes, err := os.ReadFile(path)
-	if err != nil {
-    log.Fatalf("Error reading file at %s: %s", path, err)
-	}
-	return bytes
+func ReadFile(path string) ([]byte, error) {
+	return os.ReadFile(path)
 }
 
 // WriteFile wrapper for ioutil.WriteFile
