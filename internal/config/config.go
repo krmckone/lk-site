@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"path/filepath"
 	"runtime"
 
@@ -31,30 +30,41 @@ type StylesParams struct {
 }
 
 // ReadConfig reads in the project config yaml located at path
-func ReadConfig(path string) Config {
-	b := utils.ReadFile(path)
+func ReadConfig(path string) (Config, error) {
 	config := Config{}
-	err := yaml.Unmarshal(b, &config)
+	b, err := utils.ReadFile(path)
 	if err != nil {
-		log.Fatal(err)
+		return config, err
+	}
+	err = yaml.Unmarshal(b, &config)
+	if err != nil {
+		return config, err
 	}
 
-	config = ReadIcons(config)
+	config, err = ReadIcons(config)
+	if err != nil {
+		return config, err
+	}
 	config.Template.Params["sheetsURL"] = config.Template.Styles.SheetURL
 	config.Template.Params["currentYear"] = utils.GetCurrentYear()
 	config.Template.Params["currentEasternTime"] = utils.GetCurrentEasternTime()
-	return config
+	return config, nil
 }
 
-func ReadIcons(config Config) Config {
+func ReadIcons(config Config) (Config, error) {
 	for name, path := range config.Template.Icons {
-		config.Template.Params[fmt.Sprintf("%sIcon", name)] = readIcon(path)
+		icon, err := readIcon(path)
+		if err != nil {
+			return config, err
+		}
+		config.Template.Params[fmt.Sprintf("%sIcon", name)] = icon
 	}
-	return config
+	return config, nil
 }
 
-func readIcon(name string) string {
+func readIcon(name string) (string, error) {
 	_, b, _, _ := runtime.Caller(0)
 	absolutePath := filepath.Dir(b)
-	return string(utils.ReadFile(fmt.Sprintf("%s/../../assets/icons/%s", absolutePath, name)))
+	icon, err := utils.ReadFile(fmt.Sprintf("%s/../../assets/icons/%s", absolutePath, name))
+	return string(icon), err
 }

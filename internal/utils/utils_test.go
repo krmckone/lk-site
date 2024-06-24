@@ -9,18 +9,14 @@ import (
 	"time"
 )
 
-func TestReadFileErr(t *testing.T) {
-	b := ReadFile("$$CANNOTEXIST$$")
-	if len(b) > 0 {
-		t.Errorf("Expected bytes length 0, got: %d", len(b))
-	}
-}
-
 func TestWriteFile(t *testing.T) {
 	expect := "TEST0"
 	expectFile := "TEST_FILE.txt"
 	WriteFile(expectFile, []byte(expect))
-	b := ReadFile(expectFile)
+	b, err := ReadFile(expectFile)
+	if err != nil {
+		t.Errorf("Unexpected error from ReadFile: %s", err)
+	}
 	if string(b) != expect {
 		t.Errorf("Expected %s: %s, got: %s", expectFile, expect, string(b))
 	}

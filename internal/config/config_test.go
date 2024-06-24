@@ -12,6 +12,14 @@ func TestReadConfig(t *testing.T) {
 	// do setup config files
 	// read them
 	// test contents
+  githubIcon, err := readIcon("github.svg")
+  if err != nil {
+    t.Errorf("Error loading test github icon: %s", err)
+  }
+  linkedinIcon, err := readIcon("linkedin.svg")
+  if err != nil {
+    t.Errorf("Error loading test github icon: %s", err)
+  }
 	cases := []struct {
 		template string
 		expect   Config
@@ -35,8 +43,8 @@ template:
 						"sheetsURL":          "styles.url",
 						"currentYear":        utils.GetCurrentYear(),
 						"currentEasternTime": utils.GetCurrentEasternTime(),
-						"githubIcon":         readIcon("github.svg"),
-						"linkedinIcon":       readIcon("linkedin.svg"),
+						"githubIcon":         githubIcon,
+						"linkedinIcon":       linkedinIcon,
 					},
 					Params{
 						"github":   "github.svg",
@@ -72,7 +80,10 @@ template:
 		t.Run(tName, func(t *testing.T) {
 			utils.Mkdir("test_config")
 			utils.WriteFile("test_config/config.yml", []byte(c.template))
-			actual := ReadConfig("test_config/config.yml")
+			actual, err := ReadConfig("test_config/config.yml")
+      if err != nil {
+        t.Errorf("Error in reading config: %s", err)
+      }
 			if !reflect.DeepEqual(actual, c.expect) {
 				t.Errorf("Expected: %v, actual: %v", c.expect, actual)
 			}
@@ -84,6 +95,14 @@ template:
 }
 
 func TestReadIcons(t *testing.T) {
+  githubIcon, err := readIcon("github.svg")
+  if err != nil {
+    t.Errorf("Error loading test github icon: %s", err)
+  }
+  linkedinIcon, err := readIcon("linkedin.svg")
+  if err != nil {
+    t.Errorf("Error loading test github icon: %s", err)
+  }
 	cases := []struct {
 		config Config
 		expect Config
@@ -102,8 +121,8 @@ func TestReadIcons(t *testing.T) {
 			Config{
 				TemplateConfig{
 					Params{
-						"githubIcon":   readIcon("github.svg"),
-						"linkedinIcon": readIcon("linkedin.svg"),
+						"githubIcon":   githubIcon,
+						"linkedinIcon": linkedinIcon,
 					},
 					Params{
 						"github":   "github.svg",
@@ -116,7 +135,10 @@ func TestReadIcons(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		actual := ReadIcons(c.config)
+		actual, err := ReadIcons(c.config)
+    if err != nil {
+      t.Errorf("Error reading icons: %s", err)
+    }
 		if !reflect.DeepEqual(actual, c.expect) {
 			t.Errorf("Expected: %v, actual: %v", c.expect, actual)
 		}
