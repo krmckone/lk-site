@@ -17,21 +17,21 @@ func ReadFile(path string) ([]byte, error) {
 // WriteFile wrapper for ioutil.WriteFile
 func WriteFile(path string, b []byte) {
 	if err := os.WriteFile(path, b, 0644); err != nil {
-    log.Fatalf("Error writing file at %s: %s", path, err)
+		log.Fatalf("Error writing file at %s: %s", path, err)
 	}
 }
 
 // Mkdir wrapper for os.MkdirAll
 func Mkdir(path string) {
 	if err := os.MkdirAll(path, 0755); err != nil {
-    log.Fatalf("Error making directory at %s: %s", path, err)
+		log.Fatalf("Error making directory at %s: %s", path, err)
 	}
 }
 
 // Clean cleans the directory at path
 func Clean(path string) {
 	if err := os.RemoveAll(path); err != nil {
-    log.Fatalf("Error cleaning path %s: %s", path, err)
+		log.Fatalf("Error cleaning path %s: %s", path, err)
 	}
 }
 
@@ -39,7 +39,7 @@ func Clean(path string) {
 func GetCurrentEasternTime() string {
 	location, err := time.LoadLocation("America/New_York")
 	if err != nil {
-    log.Fatalf("Error getting the current EST time: %s", err)
+		log.Fatalf("Error getting the current EST time: %s", err)
 	}
 	return time.Now().In(location).Format(time.RFC822)
 }
@@ -53,7 +53,7 @@ func GetCurrentYear() string {
 func CopyFiles(srcPath, dstPath string) {
 	entries, err := os.ReadDir(srcPath)
 	if err != nil {
-    log.Fatalf("Error reading directory at %s: %s", srcPath, err)
+		log.Fatalf("Error reading directory at %s: %s", srcPath, err)
 	}
 	for _, entry := range entries {
 		if !entry.Type().IsDir() {
@@ -74,7 +74,7 @@ func CopyFiles(srcPath, dstPath string) {
 func copyFile(srcPath, dstPath string) {
 	sourceFileStat, err := os.Stat(srcPath)
 	if err != nil {
-    log.Fatalf("Error getting description for file at %s: %s", srcPath, err)
+		log.Fatalf("Error getting description for file at %s: %s", srcPath, err)
 	}
 
 	if !sourceFileStat.Mode().IsRegular() {
@@ -83,17 +83,17 @@ func copyFile(srcPath, dstPath string) {
 
 	source, err := os.Open(srcPath)
 	if err != nil {
-    log.Fatalf("Error opening file at %s: %s", srcPath, err)
+		log.Fatalf("Error opening file at %s: %s", srcPath, err)
 	}
 	defer source.Close()
 
 	destination, err := os.Create(dstPath)
 	if err != nil {
-    log.Fatalf("Error creating file at %s: %s", dstPath, err)
+		log.Fatalf("Error creating file at %s: %s", dstPath, err)
 	}
 	defer destination.Close()
 	_, err = io.Copy(destination, source)
 	if err != nil {
-    log.Fatalf("Error copying file from %s to %s: %s", srcPath, dstPath, err)
+		log.Fatalf("Error copying file from %s to %s: %s", srcPath, dstPath, err)
 	}
 }
