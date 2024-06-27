@@ -11,6 +11,7 @@ My favorite math book, which is also free online:
 * https://gamemath.com/book/
 
 Other great sources that I've been pulling together that I want to leverage on my learning path:
+* https://edw.is/learning-vulkan/
 * https://thebookofshaders.com/
 * https://paroj.github.io/gltut/index.html
 * https://chortle.ccsu.edu/vectorlessons/vectorindex.html
