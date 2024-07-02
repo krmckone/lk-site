@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   schedule:
-    - cron: '0 13 * * *' # Nightly at 12 AM EST
+    - cron: '*/5 * * * *' # Eventually should be nightly at 12:20 AM EST
   push:
     branches: [ main ]
 
