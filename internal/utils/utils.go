@@ -2,6 +2,7 @@ package utils
 
 // TODO: Update these to return errors rather than log
 import (
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"slices"
 	"strconv"
 	"time"
 )
@@ -123,7 +125,7 @@ type SteamOwnedGamesResponse struct {
 
 func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
 	steam_api_key, present := os.LookupEnv("STEAM_API_KEY")
-	if !present {
+	if !present || steam_api_key == "" {
 		return []SteamOwnedGame{}, fmt.Errorf("STEAM_API_KEY variable not present in env")
 	}
 	baseUrl, err := url.Parse("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/")
@@ -146,6 +148,13 @@ func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
 	target := SteamOwnedGamesResponse{}
 	readHttpRespBody(resp, &target)
 	return target.Response.Games, nil
+}
+
+func GetTopFiftySteamDeckGames(games []SteamOwnedGame) []SteamOwnedGame {
+	slices.SortFunc(games, func(a, b SteamOwnedGame) int {
+		return cmp.Compare(b.PlaytimeDeckForever, a.PlaytimeDeckForever)
+	})
+	return games[:50]
 }
 
 // Invokes HTTP GET on the URL and returns the body as a string

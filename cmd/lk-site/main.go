@@ -16,7 +16,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("TESTING")
-	fmt.Println(resp)
+	fmt.Println(utils.GetTopFiftySteamDeckGames(resp))
 	fmt.Println("TESTING")
 	if err := templater.BuildSite(); err != nil {
 		panic(err)
