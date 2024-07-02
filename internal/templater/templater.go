@@ -136,6 +136,11 @@ func runComponents(gm goldmark.Markdown, c *config.Config) error {
 		return err
 	}
 
+	// Steam Deck top 50
+	if err := runComponentTemplate(gm, c, "steam_deck_top_50"); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -149,6 +154,8 @@ func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) e
 	switch name {
 	case "topnav":
 		md, err = runNavTemplate(md, c.Template.Params)
+	case "steam_deck_top_50":
+		md, err = runSteamDeckTop50Template(md, c.Template.Params)
 	default:
 		md, err = runTemplate(md, c.Template.Params)
 	}
@@ -228,6 +235,22 @@ func makeHref(assetName, originalPath string) string {
 func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
 	funcs := map[string]interface{}{"makeHrefs": makeHrefs, "makeNavTitle": makeNavTitleFromHref}
 	tmpl, err := template.New("topnav").Funcs(funcs).Parse(string(md))
+	if err != nil {
+		return nil, err
+	}
+
+	buffer := new(bytes.Buffer)
+
+	if err = tmpl.Execute(buffer, p); err != nil {
+		return nil, err
+	}
+
+	return buffer.Bytes(), nil
+}
+
+func runSteamDeckTop50Template(md []byte, p config.Params) ([]byte, error) {
+	funcs := map[string]interface{}{"topFiftySteamDeckGames": utils.GetTopFiftySteamDeckGames}
+	tmpl, err := template.New("topFiftySteamDeckGames").Funcs(funcs).Parse(string(md))
 	if err != nil {
 		return nil, err
 	}

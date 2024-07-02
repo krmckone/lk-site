@@ -150,11 +150,15 @@ func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
 	return target.Response.Games, nil
 }
 
-func GetTopFiftySteamDeckGames(games []SteamOwnedGame) []SteamOwnedGame {
+func GetTopFiftySteamDeckGames() ([]SteamOwnedGame, error) {
+	games, err := GetSteamOwnedGames()
+	if err != nil {
+		return []SteamOwnedGame{}, err
+	}
 	slices.SortFunc(games, func(a, b SteamOwnedGame) int {
 		return cmp.Compare(b.PlaytimeDeckForever, a.PlaytimeDeckForever)
 	})
-	return games[:50]
+	return games[:50], nil
 }
 
 // Invokes HTTP GET on the URL and returns the body as a string

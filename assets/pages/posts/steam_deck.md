@@ -2,6 +2,8 @@
 
 This is a short essay on my time so far with the Steam Deck, both LCD and OLED versions.
 
+{{.steam_deck_top_50}}
+
 ### Receiving the Steam Deck LCD
 
 I first received my Steam Deck LCD 256GB in July of 2022. I had been waiting for about 4 or 5 months at this point after putting five dollars down to reserve one.
