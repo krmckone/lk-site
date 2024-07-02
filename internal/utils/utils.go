@@ -1,9 +1,13 @@
 package utils
 
+// TODO: Update these to return errors rather than log
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"time"
@@ -96,4 +100,71 @@ func copyFile(srcPath, dstPath string) {
 	if err != nil {
 		log.Fatalf("Error copying file from %s to %s: %s", srcPath, dstPath, err)
 	}
+}
+
+type SteamOwnedGame struct {
+	AppId                  int    `json:"appid"`
+	Name                   string `json:"name"`
+	PlaytimeForever        int64  `json:"playtime_forever"`
+	ImgIconUrl             string `json:"img_icon_url"`
+	PlaytimeWindowsForever int64  `json:"playtime_windows_forever"`
+	PlaytimeMacForever     int64  `json:"playtime_mac_forever"`
+	PlaytimeLinuxForever   int64  `json:"playtime_linux_forever"`
+	PlaytimeDeckForever    int64  `json:"playtime_deck_forever"`
+	RTimeLastPlayed        int64  `json:"rtime_last_played"`
+}
+
+type SteamOwnedGamesResponse struct {
+	Response struct {
+		GamesCount int
+		Games      []SteamOwnedGame
+	}
+}
+
+func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
+	steam_api_key, present := os.LookupEnv("STEAM_API_KEY")
+	if !present {
+		return []SteamOwnedGame{}, fmt.Errorf("STEAM_API_KEY variable not present in env")
+	}
+	baseUrl, err := url.Parse("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/")
+	if err != nil {
+		return []SteamOwnedGame{}, err
+	}
+	params := url.Values{}
+	params.Add("key", steam_api_key)
+	params.Add("steamid", "76561197988460908") // me
+	params.Add("include_appinfo", "true")
+	params.Add("include_extended_appinfo", "true")
+	params.Add("include_played_free_games", "true")
+	params.Add("include_free_sub", "true")
+	params.Add("skip_unvetted_apps", "true")
+	baseUrl.RawQuery = params.Encode()
+	resp, err := httpGet(baseUrl.String())
+	if err != nil {
+		return []SteamOwnedGame{}, err
+	}
+	target := SteamOwnedGamesResponse{}
+	readHttpRespBody(resp, &target)
+	return target.Response.Games, nil
+}
+
+// Invokes HTTP GET on the URL and returns the body as a string
+func httpGet(url string) (*http.Response, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected HTTP GET return code: %d", resp.StatusCode)
+	}
+	return resp, nil
+}
+
+func readHttpRespBody(resp *http.Response, target interface{}) error {
+	defer resp.Body.Close()
+	err := json.NewDecoder(resp.Body).Decode(target)
+	if err != nil {
+		return fmt.Errorf("error in reading HTTP response body: %s", err)
+	}
+	return nil
 }

@@ -7,9 +7,17 @@ import (
 	"os"
 
 	"github.com/krmckone/ksite/internal/templater"
+	"github.com/krmckone/ksite/internal/utils"
 )
 
 func main() {
+	resp, err := utils.GetSteamOwnedGames()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("TESTING")
+	fmt.Println(resp)
+	fmt.Println("TESTING")
 	if err := templater.BuildSite(); err != nil {
 		panic(err)
 	}
