@@ -8,8 +8,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/krmckone/ksite/internal/config"
-	"github.com/krmckone/ksite/internal/utils"
+	"github.com/krmckone/lk-site/internal/config"
+	"github.com/krmckone/lk-site/internal/steamapi"
+	"github.com/krmckone/lk-site/internal/utils"
 	attributes "github.com/mdigger/goldmark-attributes"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -97,18 +98,27 @@ func newGoldmark() goldmark.Markdown {
 }
 
 func (p Page) exec(gm goldmark.Markdown) error {
+	// Template the page content itself before letting goldmark convert from md to HTML
+	tmpl, err := template.New("template").Parse(string(p.Content))
+	if err != nil {
+		return err
+	}
+	templBuffer := new(bytes.Buffer)
+	if err = tmpl.Execute(templBuffer, p.Params); err != nil {
+		return err
+	}
 	mdBuffer := new(bytes.Buffer)
-	if err := gm.Convert(p.Content, mdBuffer); err != nil {
+	if err := gm.Convert(templBuffer.Bytes(), mdBuffer); err != nil {
 		return err
 	}
 	p.Params["main_content"] = mdBuffer.String()
 
-	tmpl, err := template.New("template").Parse(string(p.Template))
+	tmpl, err = template.New("template").Parse(string(p.Template))
 	if err != nil {
 		return err
 	}
 
-	templBuffer := new(bytes.Buffer)
+	templBuffer = new(bytes.Buffer)
 	if err = tmpl.Execute(templBuffer, p.Params); err != nil {
 		return err
 	}
@@ -136,6 +146,11 @@ func runComponents(gm goldmark.Markdown, c *config.Config) error {
 		return err
 	}
 
+	// Steam Deck top 50
+	if err := runComponentTemplate(gm, c, "steam_deck_top_50"); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -149,6 +164,8 @@ func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) e
 	switch name {
 	case "topnav":
 		md, err = runNavTemplate(md, c.Template.Params)
+	case "steam_deck_top_50":
+		md, err = runSteamDeckTop50Template(md, c.Template.Params)
 	default:
 		md, err = runTemplate(md, c.Template.Params)
 	}
@@ -228,6 +245,23 @@ func makeHref(assetName, originalPath string) string {
 func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
 	funcs := map[string]interface{}{"makeHrefs": makeHrefs, "makeNavTitle": makeNavTitleFromHref}
 	tmpl, err := template.New("topnav").Funcs(funcs).Parse(string(md))
+	if err != nil {
+		return nil, err
+	}
+
+	buffer := new(bytes.Buffer)
+
+	if err = tmpl.Execute(buffer, p); err != nil {
+		return nil, err
+	}
+
+	return buffer.Bytes(), nil
+}
+
+// TODO: Can we generalize component generation?
+func runSteamDeckTop50Template(md []byte, p config.Params) ([]byte, error) {
+	funcs := map[string]interface{}{"topFiftySteamDeckGames": steamapi.GetTopFiftySteamDeckGames}
+	tmpl, err := template.New("topFiftySteamDeckGames").Funcs(funcs).Parse(string(md))
 	if err != nil {
 		return nil, err
 	}

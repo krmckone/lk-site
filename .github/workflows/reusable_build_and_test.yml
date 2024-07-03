@@ -34,6 +34,8 @@ jobs:
       run: go test -v ./...
 
     - name: Build Static
+      env:
+        STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
       run: go run cmd/lk-site/main.go
 
     - name: Check HTML
