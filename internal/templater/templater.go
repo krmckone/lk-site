@@ -10,6 +10,7 @@ import (
 
 	"github.com/krmckone/ksite/internal/config"
 	"github.com/krmckone/ksite/internal/utils"
+	steamapi "github.com/krmckone/ksite/internal/utils/steam_api"
 	attributes "github.com/mdigger/goldmark-attributes"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -97,6 +98,7 @@ func newGoldmark() goldmark.Markdown {
 }
 
 func (p Page) exec(gm goldmark.Markdown) error {
+	// Template the page content itself before letting goldmark convert from md to HTML
 	tmpl, err := template.New("template").Parse(string(p.Content))
 	if err != nil {
 		return err
@@ -256,8 +258,9 @@ func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
+// TODO: Can we generalize component generation?
 func runSteamDeckTop50Template(md []byte, p config.Params) ([]byte, error) {
-	funcs := map[string]interface{}{"topFiftySteamDeckGames": utils.GetTopFiftySteamDeckGames}
+	funcs := map[string]interface{}{"topFiftySteamDeckGames": steamapi.GetTopFiftySteamDeckGames}
 	tmpl, err := template.New("topFiftySteamDeckGames").Funcs(funcs).Parse(string(md))
 	if err != nil {
 		return nil, err
