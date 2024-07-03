@@ -121,3 +121,16 @@ func ReadHttpRespBody(resp *http.Response, target interface{}) error {
 	}
 	return nil
 }
+
+// Generic filtering
+func Filter[S ~[]E, E any](s S, f func(E) bool) []E {
+	result := []E{}
+
+	for i := range s {
+		if f(s[i]) {
+			result = append(result, s[i])
+		}
+	}
+
+	return result
+}

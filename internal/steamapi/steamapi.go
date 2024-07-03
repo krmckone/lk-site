@@ -67,10 +67,17 @@ func GetTopFiftySteamDeckGames() ([]SteamOwnedGame, error) {
 	if err := ProcessOwnedGames(games); err != nil {
 		return []SteamOwnedGame{}, err
 	}
-	slices.SortFunc(games, func(a, b SteamOwnedGame) int {
+	steamDeckGames := utils.Filter(games, func(g SteamOwnedGame) bool {
+		if g.PlaytimeDeckForever > 0.0 {
+			return true
+		} else {
+			return false
+		}
+	})
+	slices.SortFunc(steamDeckGames, func(a, b SteamOwnedGame) int {
 		return cmp.Compare(b.PlaytimeDeckForever, a.PlaytimeDeckForever)
 	})
-	return games[:50], nil
+	return steamDeckGames[:50], nil
 }
 
 // For adding any additional processing/formatting to the owned games data
@@ -78,15 +85,22 @@ func ProcessOwnedGames(games []SteamOwnedGame) error {
 	for i := range games {
 		// Steam deck played time from minutes to hours
 		hours := games[i].PlaytimeDeckForever / 60.0
-		truncate := fmt.Sprintf("%.2f", hours)
-		t, err := strconv.ParseFloat(truncate, 64)
+		truncated, err := truncateFloat(hours)
 		if err != nil {
 			return err
 		}
-		games[i].PlaytimeDeckForever = t
+		games[i].PlaytimeDeckForever = truncated
 
 		lastPlayed := time.Unix(games[i].RTimeLastPlayed, 0)
 		games[i].FormattedTimeLastPlayed = fmt.Sprintf("%s %d %d", lastPlayed.Month(), lastPlayed.Day(), lastPlayed.Year())
 	}
 	return nil
+}
+
+func truncateFloat(f float64) (float64, error) {
+	t, err := strconv.ParseFloat(fmt.Sprintf("%.2f", f), 64)
+	if err != nil {
+		return t, err
+	}
+	return t, nil
 }
