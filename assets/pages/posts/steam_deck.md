@@ -2,8 +2,6 @@
 
 This is a short essay on my time so far with the Steam Deck, both LCD and OLED versions.
 
-{{.steam_deck_top_50}}
-
 ### Receiving the Steam Deck LCD
 
 I first received my Steam Deck LCD 256GB in July of 2022. I had been waiting for about 4 or 5 months at this point after putting five dollars down to reserve one.
@@ -39,74 +37,9 @@ Here is my summary/generalization for features that should allow the game to pla
 
 One additional feature of the steam deck that may go overlooked is the support for multiple controllers simultaneously, just like a console. For example, split screen in local-coop games should just work if you connect multiple controllers to the deck. This works great with the steam deck dock plugged into a TV.
 
-##### My favorite games on Steam Deck so far in no particular order
-* [Vampire Survivors](https://store.steampowered.com/app/1794680/Vampire_Survivors/)
-* [Pillars of Eternity](https://store.steampowered.com/app/291650/Pillars_of_Eternity/)
-* [Slay the Spire](https://store.steampowered.com/app/646570/Slay_the_Spire/)
-* [Assassins Creed Origins](https://store.steampowered.com/app/582160/Assassins_Creed_Origins/)
-* [War Thunder](https://store.steampowered.com/app/236390/War_Thunder/)
-* [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/)
-* [Terraria](https://store.steampowered.com/app/105600/Terraria/)
-* [Risk of Rain 2](https://store.steampowered.com/app/632360/Risk_of_Rain_2/)
-* [Melvor Idle](https://store.steampowered.com/app/1267910/Melvor_Idle/)
-* [Thronebreaker](https://store.steampowered.com/app/973760/Thronebreaker_The_Witcher_Tales/)
-* [System Shock Remake](https://store.steampowered.com/app/482400/System_Shock/)
-* [American Truck Simulator](https://store.steampowered.com/app/270880/American_Truck_Simulator/)
-* [Left 4 Dead 2](https://store.steampowered.com/app/550/Left_4_Dead_2/)
-* [Dread Delusion](https://store.steampowered.com/app/1574240/Dread_Delusion/)
-* [The Long Dark](https://store.steampowered.com/app/305620/The_Long_Dark/)
-* [Fallout 3](https://store.steampowered.com/app/22370/Fallout_3_Game_of_the_Year_Edition/)
-* [Dead Cells](https://store.steampowered.com/app/588650/Dead_Cells/)
-* [Darkest Dungeon](https://store.steampowered.com/app/262060/Darkest_Dungeon/)
-* [Balatro](https://store.steampowered.com/app/2379780/Balatro/)
-* [Dave The Diver](https://store.steampowered.com/app/1868140/DAVE_THE_DIVER/)
-* [Halls of Torment](https://store.steampowered.com/app/2218750/Halls_of_Torment/)
-* [No Man's Sky](https://store.steampowered.com/app/275850/No_Mans_Sky/)
-* [Backpack Battles](https://store.steampowered.com/app/2427700/Backpack_Battles/)
-* [The Talos Principle](https://store.steampowered.com/app/257510/The_Talos_Principle/)
-* [Into the Breach](https://store.steampowered.com/app/590380/Into_the_Breach/)
-* [Fable Anniversary](https://store.steampowered.com/app/288470/Fable_Anniversary/)
-* [Nova Drift](https://store.steampowered.com/app/858210/Nova_Drift/)
-* [Fabledom](https://store.steampowered.com/app/1651560/Fabledom/)
-* [Overcooked 2](https://store.steampowered.com/app/728880/Overcooked_2/)
-* [Astroneer](https://store.steampowered.com/app/361420/ASTRONEER/)
-* [Monster Hunter: World](https://store.steampowered.com/app/582010/Monster_Hunter_World/)
-* [Hardspace: Shipbraker](https://store.steampowered.com/app/1161580/Hardspace_Shipbreaker/)
-* [Thronefall](https://store.steampowered.com/app/2239150/Thronefall/)
-* [Dome Keeper](https://store.steampowered.com/app/1637320/Dome_Keeper/)
-* [Jupiter Hell](https://store.steampowered.com/app/811320/Jupiter_Hell/)
-* [Moonlighter](https://store.steampowered.com/app/606150/Moonlighter/)
-* [Patch Quest](https://store.steampowered.com/app/1347970/Patch_Quest/)
-* [Caves of Qud](https://store.steampowered.com/app/333640/Caves_of_Qud/)
-* [Half-Life 2](https://store.steampowered.com/app/220/HalfLife_2/)
-* [Teardown](https://store.steampowered.com/app/1167630/Teardown/)
-* [Hexologic](https://store.steampowered.com/app/785890/Hexologic/)
-* [Bloons TD 6](https://store.steampowered.com/app/960090/Bloons_TD_6/)
-* [Buckshot Roulette](https://store.steampowered.com/app/2835570/Buckshot_Roulette/)
-* [Hero's Hour](https://store.steampowered.com/app/1656780/Heros_Hour/)
-* [Dragon's Dogma](https://store.steampowered.com/app/367500/Dragons_Dogma_Dark_Arisen/)
-* [DotAGE](https://store.steampowered.com/app/638510/dotAGE/)
-* [NFS Heat](https://store.steampowered.com/app/1222680/Need_for_Speed_Heat/)
-* [Binding of Isaac Rebirth](https://store.steampowered.com/app/250900/The_Binding_of_Isaac_Rebirth/)
-* [Mount and Blade: Bannerlord](https://store.steampowered.com/app/261550/Mount__Blade_II_Bannerlord/)
-* [The Room](https://store.steampowered.com/app/288160/The_Room/)
-* [Brotato](https://store.steampowered.com/app/1942280/Brotato/)
-* [Risk of Rain Returns](https://store.steampowered.com/app/1337520/Risk_of_Rain_Returns/)
-* [Return of the Obra Dinn](https://store.steampowered.com/app/653530/Return_of_the_Obra_Dinn/)
-* [Tony Hawk Pro Skater 1+2](https://store.steampowered.com/app/2395210/Tony_Hawks_Pro_Skater_1__2/)
-* [Mini Motorways](https://store.steampowered.com/app/1127500/Mini_Motorways/)
-* [Signalis](https://store.steampowered.com/app/1262350/SIGNALIS/)
-* [Kenshi](https://store.steampowered.com/app/233860/Kenshi/)
-* [Mindustry](https://store.steampowered.com/app/1127400/Mindustry/)
-* [Darkwood](https://store.steampowered.com/app/274520/Darkwood/)
-* [Turing Complete](https://store.steampowered.com/app/1444480/Turing_Complete/)
-* [Garden Story](https://store.steampowered.com/app/1062140/Garden_Story/)
-* [20 Minutes TillDawn](https://store.steampowered.com/app/1966900/20_Minutes_Till_Dawn/)
-* [Bugsnax](https://store.steampowered.com/app/674140/Bugsnax/)
-* [Yes, Your Grace](https://store.steampowered.com/app/1115690/Yes_Your_Grace/)
-* [Undermine](https://store.steampowered.com/app/656350/UnderMine/)
-* [Lawn Mowing Simulator](https://store.steampowered.com/app/1480560/Lawn_Mowing_Simulator/)
-* [Ryse, Son of Rome](https://store.steampowered.com/app/302510/Ryse_Son_of_Rome/)
+## My top 50 most played games on steam deck
+#### This list is automatically updated twice daily
+{{.steam_deck_top_50}}
 
 ### What Kind of Games Do Not Work Well
 

@@ -105,15 +105,16 @@ func copyFile(srcPath, dstPath string) {
 }
 
 type SteamOwnedGame struct {
-	AppId                  int    `json:"appid"`
-	Name                   string `json:"name"`
-	PlaytimeForever        int64  `json:"playtime_forever"`
-	ImgIconUrl             string `json:"img_icon_url"`
-	PlaytimeWindowsForever int64  `json:"playtime_windows_forever"`
-	PlaytimeMacForever     int64  `json:"playtime_mac_forever"`
-	PlaytimeLinuxForever   int64  `json:"playtime_linux_forever"`
-	PlaytimeDeckForever    int64  `json:"playtime_deck_forever"`
-	RTimeLastPlayed        int64  `json:"rtime_last_played"`
+	AppId                   int     `json:"appid"`
+	Name                    string  `json:"name"`
+	PlaytimeForever         float64 `json:"playtime_forever"`
+	ImgIconUrl              string  `json:"img_icon_url"`
+	PlaytimeWindowsForever  float64 `json:"playtime_windows_forever"`
+	PlaytimeMacForever      float64 `json:"playtime_mac_forever"`
+	PlaytimeLinuxForever    float64 `json:"playtime_linux_forever"`
+	PlaytimeDeckForever     float64 `json:"playtime_deck_forever"`
+	RTimeLastPlayed         int64   `json:"rtime_last_played"`
+	FormattedTimeLastPlayed string
 }
 
 type SteamOwnedGamesResponse struct {
@@ -155,10 +156,31 @@ func GetTopFiftySteamDeckGames() ([]SteamOwnedGame, error) {
 	if err != nil {
 		return []SteamOwnedGame{}, err
 	}
+	if err := ProcessOwnedGames(games); err != nil {
+		return []SteamOwnedGame{}, err
+	}
 	slices.SortFunc(games, func(a, b SteamOwnedGame) int {
 		return cmp.Compare(b.PlaytimeDeckForever, a.PlaytimeDeckForever)
 	})
 	return games[:50], nil
+}
+
+// For adding any additional processing/formatting to the owned games data
+func ProcessOwnedGames(games []SteamOwnedGame) error {
+	for i := range games {
+		// Steam deck played time from minutes to hours
+		hours := games[i].PlaytimeDeckForever / 60.0
+		truncate := fmt.Sprintf("%.2f", hours)
+		t, err := strconv.ParseFloat(truncate, 64)
+		if err != nil {
+			return err
+		}
+		games[i].PlaytimeDeckForever = t
+
+		lastPlayed := time.Unix(games[i].RTimeLastPlayed, 0)
+		games[i].FormattedTimeLastPlayed = fmt.Sprintf("%s %d %d", lastPlayed.Month(), lastPlayed.Day(), lastPlayed.Year())
+	}
+	return nil
 }
 
 // Invokes HTTP GET on the URL and returns the body as a string

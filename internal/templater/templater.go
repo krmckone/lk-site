@@ -97,18 +97,26 @@ func newGoldmark() goldmark.Markdown {
 }
 
 func (p Page) exec(gm goldmark.Markdown) error {
+	tmpl, err := template.New("template").Parse(string(p.Content))
+	if err != nil {
+		return err
+	}
+	templBuffer := new(bytes.Buffer)
+	if err = tmpl.Execute(templBuffer, p.Params); err != nil {
+		return err
+	}
 	mdBuffer := new(bytes.Buffer)
-	if err := gm.Convert(p.Content, mdBuffer); err != nil {
+	if err := gm.Convert(templBuffer.Bytes(), mdBuffer); err != nil {
 		return err
 	}
 	p.Params["main_content"] = mdBuffer.String()
 
-	tmpl, err := template.New("template").Parse(string(p.Template))
+	tmpl, err = template.New("template").Parse(string(p.Template))
 	if err != nil {
 		return err
 	}
 
-	templBuffer := new(bytes.Buffer)
+	templBuffer = new(bytes.Buffer)
 	if err = tmpl.Execute(templBuffer, p.Params); err != nil {
 		return err
 	}
