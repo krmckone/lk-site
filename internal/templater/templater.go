@@ -8,9 +8,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/krmckone/ksite/internal/config"
-	"github.com/krmckone/ksite/internal/utils"
-	steamapi "github.com/krmckone/ksite/internal/utils/steam_api"
+	"github.com/krmckone/lk-site/internal/config"
+	"github.com/krmckone/lk-site/internal/steamapi"
+	"github.com/krmckone/lk-site/internal/utils"
 	attributes "github.com/mdigger/goldmark-attributes"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"

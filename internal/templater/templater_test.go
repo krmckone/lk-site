@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/krmckone/ksite/internal/config"
+	"github.com/krmckone/lk-site/internal/config"
 )
 
 func TestReplaceVars(t *testing.T) {

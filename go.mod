@@ -1,4 +1,4 @@
-module github.com/krmckone/ksite
+module github.com/krmckone/lk-site
 
 go 1.22
 
