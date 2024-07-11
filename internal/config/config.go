@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/krmckone/ksite/internal/utils"
+	"github.com/krmckone/lk-site/internal/utils"
 	"gopkg.in/yaml.v2"
 )
 

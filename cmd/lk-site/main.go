@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/krmckone/ksite/internal/templater"
+	"github.com/krmckone/lk-site/internal/templater"
 )
 
 func main() {

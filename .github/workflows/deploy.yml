@@ -2,13 +2,14 @@ name: Deploy
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # Eventually should be nightly at 12:20 AM EST
+    - cron: '25 4,21 * * *' # Runs at 12:25AM and 5:25PM EST daily. The hours reflect UTC time
   push:
     branches: [ main ]
 
 jobs:
   build-and-test:
     uses: ./.github/workflows/reusable_build_and_test.yml
+    secrets: inherit
 
   deploy:
     name: Deploy Static Site

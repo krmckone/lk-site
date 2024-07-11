@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/krmckone/ksite/internal/utils"
+	"github.com/krmckone/lk-site/internal/utils"
 )
 
 func TestReadConfig(t *testing.T) {

@@ -7,3 +7,4 @@ on:
 jobs:
   build-and-test:
     uses: ./.github/workflows/reusable_build_and_test.yml
+    secrets: inherit
