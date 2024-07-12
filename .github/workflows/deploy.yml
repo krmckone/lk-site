@@ -53,6 +53,6 @@ jobs:
         git add .
         git commit -m "New Release $referenceLink $releaseDate"
         git push origin HEAD
-        echo -e "* This pull request was automatically created from ${{ github.server_url }}/krmckone/lk-site/actions/runs/${{ github.run_id }}.\n* This release is based on $referenceLink" > body
-        gh pr create --title "Automatic PR $releaseDate" --body-file body
+        echo -e "* This pull request was automatically created and merged by ${{ github.server_url }}/krmckone/lk-site/actions/runs/${{ github.run_id }}.\n* This release is based on $referenceLink" > body
+        gh pr create --title "Automatic Release $releaseDate" --body-file body
         gh pr merge --auto --merge
