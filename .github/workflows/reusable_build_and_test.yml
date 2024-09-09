@@ -45,6 +45,8 @@ jobs:
         check_favicon: false
         ignore_url: |
           https://linkedin.com/in/krmckone
+          https://linkedin.com/in/fy2721
+          https://chortle.ccsu.edu/vectorlessons/vectorindex.html
     - name: Upload Static Artifacts
       uses: actions/upload-artifact@v4
       with:
