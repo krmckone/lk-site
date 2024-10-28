@@ -28,6 +28,8 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           repository: "krmckone/krm-site"
+      - name: Show working dir
+        run: pwd
       - name: Make the deploy script executable
         run: chmod +x ../scripts/deploy.sh
       - name: Deploy
