@@ -64,3 +64,4 @@ jobs:
             ((retries++))
             echo "GH CLI returned non-zero after $retries attempts, going to retry auto merge"
           done
+          echo "PR merged successfuly in krm-site"
