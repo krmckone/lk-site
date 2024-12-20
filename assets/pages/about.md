@@ -1,6 +1,6 @@
 ### About me
 
-My name is Kaleb McKone. I'm a software engineer with a current focus in web development. I currently work at freight SaaS company called Transfix. In the past I've worked at at Thomson Reuters, the University of Iowa, Target HQ, and an ed tech startup.
+My name is Kaleb McKone. I'm a software engineer with a current focus in web development. I currently work at TPM startup Vividy. In the past I've worked at at Thomson Reuters, the University of Iowa, Target HQ, an ed tech startup and a freight tech SaaS startup.
 
 My goal is to pivot into computer graphics with a focus on real time rendering. Part of this site's purpose is to document my learning journey as I try to break into the computer graphics space.
 
