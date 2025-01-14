@@ -4,6 +4,7 @@ RELEASE_DATE=$(date +%m-%d-%y-%H:%M:%S)
 REFERENCE_LINK="krmckone/lk-site@$(git rev-parse --short $GITHUB_SHA)"
 
 configure_git() {
+  git config --global --type bool push.autoSetupRemote true
   git config --global user.name "Kaleb's GitHub Actions Bot from lk-site"
   git config --global user.email "20476319+krmckone@users.noreply.github.com" # TODO: Parameterize
 }
@@ -18,7 +19,7 @@ copy_site_files() {
 }
 
 commit_changes() {
-  git status
+  git status --porcelain
   local site_modified=$(git status --porcelain)
   if [[ -z $site_modified ]]; then
     echo "No changes to the static site. Exiting without asset deployment."
