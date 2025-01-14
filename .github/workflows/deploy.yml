@@ -16,24 +16,32 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-test
     steps:
-      - name: Download Static Site
+      - name: Download Static Site Build Artifacts
         uses: actions/download-artifact@v4
         with:
           name: site
           path: ~/site
           github-token: ${{ secrets.GH_PAT }}
           run-id: ${{ github.run_id }}
-      - name: Check out code at the deploy location
-        uses: actions/checkout@v2
+      - name: Check out krm-site (deploy target repository)
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_PAT }}
           repository: "krmckone/krm-site"
+          path: "krm-site"
+      - name: Check out lk-site (deploy source repository)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          repository: "krmckone/lk-site"
+          path: "lk-site"
       - name: "Pwd and ls"
         run: pwd && ls
       - name: Make deploy script executable
-        run: chmod +x deploy.sh
+        run: chmod +x lk-site/.github/workflows/scripts/deploy.sh
       - name: Deploy
         shell: bash --noprofile --norc -o pipefail {0}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-        run: ./deploy.sh
+        working-directory: "krm-site"
+        run: ../lk-site/.github/workflows/scripts/deploy.sh
