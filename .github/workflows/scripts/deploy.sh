@@ -9,7 +9,7 @@ configure_git() {
 # Function to create a new branch for deployment
 create_deployment_branch() {
   local release_hash=$(git rev-parse --short $GITHUB_SHA)
-  git checkout -b "lk-site-deploy-${{ github.ref_name }}-$release_hash"
+  git checkout -b "lk-site-deploy-$GITHUB_REF_NAME-$release_hash"
 }
 
 # Function to copy site files
@@ -36,7 +36,7 @@ create_and_merge_pr() {
   local release_date=$(date +%m-%d-%y-%H:%M:%S)
   local reference_link="krmckone/lk-site@$(git rev-parse --short $GITHUB_SHA)"
 
-  echo -e "* This pull request was automatically created and merged by ${{ github.server_url }}/krmckone/lk-site/actions/runs/${{ github.run_id }}.\n* This release is based on $reference_link" > body
+  echo -e "* This pull request was automatically created and merged by $GITHUB_SERVER_URL/krmckone/lk-site/actions/runs/$GITHUB_RUN_ID.\n* This release is based on $reference_link" > body
   gh pr create --title "Automatic Release $release_date" --body-file body
 
   local max_retries=4
