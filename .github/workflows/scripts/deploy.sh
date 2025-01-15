@@ -20,7 +20,6 @@ copy_site_files() {
 
 commit_changes() {
   git status --porcelain
-  git --no-pager diff # Output the diff directly without a pager
   local site_modified=$(git status --porcelain)
   if [[ -z $site_modified ]]; then
     echo "No changes to the static site. Exiting without asset deployment."
@@ -36,6 +35,7 @@ commit_changes() {
 create_and_merge_pr() {
   echo -e "* This pull request was automatically created and merged by $GITHUB_SERVER_URL/krmckone/lk-site/actions/runs/$GITHUB_RUN_ID.\n* This release is based on $REFERENCE_LINK" > body
   gh pr create --title "Automatic Release $RELEASE_DATE" --body-file body
+  gh pr diff --patch | cat
 
   local max_retries=2
   local retries=0
