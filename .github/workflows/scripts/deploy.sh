@@ -20,6 +20,7 @@ copy_site_files() {
 
 commit_changes() {
   git status --porcelain
+  git --no-pager diff # Output the diff directly without a pager
   local site_modified=$(git status --porcelain)
   if [[ -z $site_modified ]]; then
     echo "No changes to the static site. Exiting without asset deployment."
