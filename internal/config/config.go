@@ -22,7 +22,7 @@ type TemplateConfig struct {
 }
 
 // Params template variable parameters config
-type Params map[string]string
+type Params map[string]interface{}
 
 // StylesParams parameters for stylesheets
 type StylesParams struct {
@@ -62,7 +62,7 @@ func ReadIcons(config Config) (Config, error) {
 	return config, nil
 }
 
-func readIcon(name string) (string, error) {
+func readIcon(name interface{}) (string, error) {
 	_, b, _, _ := runtime.Caller(0)
 	absolutePath := filepath.Dir(b)
 	icon, err := utils.ReadFile(fmt.Sprintf("%s/../../assets/icons/%s", absolutePath, name))

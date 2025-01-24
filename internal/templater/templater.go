@@ -3,13 +3,13 @@ package templater
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
-	"text/template"
 
 	"github.com/krmckone/lk-site/internal/config"
-	"github.com/krmckone/lk-site/internal/steamapi"
 	"github.com/krmckone/lk-site/internal/utils"
 	attributes "github.com/mdigger/goldmark-attributes"
 	"github.com/yuin/goldmark"
@@ -25,7 +25,7 @@ type Page struct {
 	Title         string
 	Content       []byte
 	Template      []byte
-	Params        map[string]string
+	Params        map[string]interface{}
 	BuildPathRoot string
 }
 
@@ -59,22 +59,53 @@ func BuildSite() error {
 		return err
 	}
 
-	if err := runComponents(gm, &c); err != nil {
-		return err
-	}
-
-	basePages, err := getPages("assets/pages", c.Template.Params, "/")
+	pages, err := getPages("assets/pages", c.Template.Params, "")
 	if err != nil {
 		return err
 	}
 
-	posts, err := getPages("assets/pages/posts", c.Template.Params, "/posts")
+	funcs := map[string]interface{}{"makeHrefs": makeHrefs, "makeNavTitle": makeNavTitleFromHref}
+	tmpl := template.New("base_page.html")
+	tmpl, err = tmpl.Funcs(funcs).ParseFiles("assets/base_page.html", "assets/header.html", "assets/footer.html", "assets/topnav.html")
 	if err != nil {
 		return err
 	}
 
-	for _, p := range append(basePages, posts...) {
-		if err := p.exec(gm); err != nil {
+	for _, page := range pages {
+		mdTemplate, err := template.New("md").Parse(string(page.Content))
+		if err != nil {
+			return err
+		}
+
+		var templatedMD bytes.Buffer
+		if err := mdTemplate.Execute(&templatedMD, page.Params); err != nil {
+			return err
+		}
+
+		var mdBuffer bytes.Buffer
+		if err := gm.Convert(templatedMD.Bytes(), &mdBuffer); err != nil {
+			return err
+		}
+
+		pageParams := make(map[string]interface{})
+		for k, v := range c.Template.Params {
+			if k == "githubIcon" || k == "linkedinIcon" {
+				pageParams[k] = template.HTML(v.(string))
+			} else {
+				pageParams[k] = v
+			}
+		}
+		pageParams["main_content"] = template.HTML(mdBuffer.String())
+		pageParams["title"] = page.Title
+
+		outputPath := fmt.Sprintf("build/%s.html", page.Title)
+		f, err := os.Create(outputPath)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		if err := tmpl.ExecuteTemplate(f, "base_page.html", pageParams); err != nil {
 			return err
 		}
 	}
@@ -92,12 +123,11 @@ func newGoldmark() goldmark.Markdown {
 		),
 		goldmark.WithRendererOptions(
 			html.WithHardWraps(),
-			html.WithUnsafe(),
 		),
 	)
 }
 
-func (p Page) exec(gm goldmark.Markdown) error {
+/* func (p Page) exec(gm goldmark.Markdown) error {
 	// Template the page content itself before letting goldmark convert from md to HTML
 	tmpl, err := template.New("template").Parse(string(p.Content))
 	if err != nil {
@@ -111,7 +141,7 @@ func (p Page) exec(gm goldmark.Markdown) error {
 	if err := gm.Convert(templBuffer.Bytes(), mdBuffer); err != nil {
 		return err
 	}
-	p.Params["main_content"] = mdBuffer.String()
+	p.Params["main_content"] = template.HTML(mdBuffer.String())
 
 	tmpl, err = template.New("template").Parse(string(p.Template))
 	if err != nil {
@@ -152,9 +182,9 @@ func runComponents(gm goldmark.Markdown, c *config.Config) error {
 	}
 
 	return nil
-}
+} */
 
-func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) error {
+/* func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) error {
 	buf := new(bytes.Buffer)
 	md, err := utils.ReadFile(fmt.Sprintf("assets/components/%s.md", name))
 	if err != nil {
@@ -178,7 +208,7 @@ func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) e
 	c.Template.Params[name] = buf.String()
 
 	return nil
-}
+} */
 
 func runTemplate(md []byte, p config.Params) ([]byte, error) {
 	tmpl, err := template.New("template").Parse(string(md))
@@ -259,7 +289,7 @@ func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
 }
 
 // TODO: Can we generalize component generation?
-func runSteamDeckTop50Template(md []byte, p config.Params) ([]byte, error) {
+/* func runSteamDeckTop50Template(md []byte, p config.Params) ([]byte, error) {
 	funcs := map[string]interface{}{"topFiftySteamDeckGames": steamapi.GetTopFiftySteamDeckGames}
 	tmpl, err := template.New("topFiftySteamDeckGames").Funcs(funcs).Parse(string(md))
 	if err != nil {
@@ -274,29 +304,36 @@ func runSteamDeckTop50Template(md []byte, p config.Params) ([]byte, error) {
 
 	return buffer.Bytes(), nil
 }
+*/
 
-func getPages(path string, p config.Params, buildPathRoot string) ([]Page, error) {
+func getPages(path string, params map[string]interface{}, buildPathRoot string) ([]Page, error) {
 	pages := make([]Page, 0)
 
-	names, err := getAssets(path)
+	// Read directory
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return pages, err
 	}
 
-	// Override the base page template here
-	basePage, err := utils.ReadFile("assets/base_page.html")
-	if err != nil {
-		return pages, err
-	}
-	for _, name := range names {
-		md, err := utils.ReadFile(fmt.Sprintf("%s/%s.md", path, name))
+	// Process each markdown file
+	for _, file := range files {
+		if file.IsDir() || !strings.HasSuffix(file.Name(), ".md") {
+			continue
+		}
+
+		// Read markdown content
+		content, err := os.ReadFile(filepath.Join(path, file.Name()))
 		if err != nil {
 			return pages, err
 		}
-		// Override any params here before making the page
-		page, err := newPage(name, md, basePage, p, buildPathRoot)
-		if err != nil {
-			return pages, err
+
+		// Create page with the markdown content
+		title := strings.TrimSuffix(file.Name(), ".md")
+		page := Page{
+			Title:         title,
+			Content:       content,
+			Params:        params,
+			BuildPathRoot: buildPathRoot,
 		}
 		pages = append(pages, page)
 	}
@@ -304,7 +341,7 @@ func getPages(path string, p config.Params, buildPathRoot string) ([]Page, error
 	return pages, nil
 }
 
-func newPage(title string, content []byte, template []byte, params map[string]string, buildPathRoot string) (Page, error) {
+func newPage(title string, content []byte, template []byte, params map[string]interface{}, buildPathRoot string) (Page, error) {
 	return Page{
 		title,
 		content,
