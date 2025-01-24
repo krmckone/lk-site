@@ -307,17 +307,23 @@ func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
 */
 
 func getPages(path string, params map[string]interface{}, buildPathRoot string) ([]Page, error) {
-	pages := make([]Page, 0)
+	pages := []Page{}
 
-	// Read directory
 	files, err := os.ReadDir(path)
 	if err != nil {
 		return pages, err
 	}
 
-	// Process each markdown file
+	// TODO: Nested directories
 	for _, file := range files {
-		if file.IsDir() || !strings.HasSuffix(file.Name(), ".md") {
+		if file.IsDir() {
+			subPages, err := getPages(filepath.Join(path, file.Name()), params, buildPathRoot)
+			if err != nil {
+				return pages, err
+			}
+			pages = append(pages, subPages...)
+		}
+		if !strings.HasSuffix(file.Name(), ".md") {
 			continue
 		}
 
