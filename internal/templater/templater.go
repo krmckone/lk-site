@@ -123,6 +123,7 @@ func newGoldmark() goldmark.Markdown {
 		),
 		goldmark.WithRendererOptions(
 			html.WithHardWraps(),
+			html.WithUnsafe(), // For embedding our own HTML in markdown files. Without this, goldmark will hide the HTML content in the output
 		),
 	)
 }
