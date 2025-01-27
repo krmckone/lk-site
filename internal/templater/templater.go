@@ -91,7 +91,7 @@ func BuildSite() error {
 			}
 		}
 		pageParams["main_content"] = template.HTML(mdBuffer.String())
-		pageParams["title"] = page.Title
+		pageParams["title"] = c.Template.Params["title"]
 		// Put the output file in the build dir that the ExecuteTemplate function expects
 		outputPath := filepath.Join(page.BuildPath, fmt.Sprintf("%s.html", page.Title))
 		if err := os.MkdirAll(filepath.Dir(outputPath), os.ModePerm); err != nil {
@@ -125,103 +125,6 @@ func newGoldmark() goldmark.Markdown {
 			html.WithHardWraps(),
 		),
 	)
-}
-
-/* func (p Page) exec(gm goldmark.Markdown) error {
-	// Template the page content itself before letting goldmark convert from md to HTML
-	tmpl, err := template.New("template").Parse(string(p.Content))
-	if err != nil {
-		return err
-	}
-	templBuffer := new(bytes.Buffer)
-	if err = tmpl.Execute(templBuffer, p.Params); err != nil {
-		return err
-	}
-	mdBuffer := new(bytes.Buffer)
-	if err := gm.Convert(templBuffer.Bytes(), mdBuffer); err != nil {
-		return err
-	}
-	p.Params["main_content"] = template.HTML(mdBuffer.String())
-
-	tmpl, err = template.New("template").Parse(string(p.Template))
-	if err != nil {
-		return err
-	}
-
-	templBuffer = new(bytes.Buffer)
-	if err = tmpl.Execute(templBuffer, p.Params); err != nil {
-		return err
-	}
-
-	pathRoot := fmt.Sprintf("build/%s", p.BuildPathRoot)
-	os.MkdirAll(pathRoot, 0700)
-	utils.WriteFile(fmt.Sprintf("%s/%s.html", pathRoot, p.Title), templBuffer.Bytes())
-
-	return nil
-}
-
-func runComponents(gm goldmark.Markdown, c *config.Config) error {
-	// Do topnav content
-	if err := runComponentTemplate(gm, c, "topnav"); err != nil {
-		return err
-	}
-
-	// Do header content
-	if err := runComponentTemplate(gm, c, "header"); err != nil {
-		return err
-	}
-
-	// Do footer content
-	if err := runComponentTemplate(gm, c, "footer"); err != nil {
-		return err
-	}
-
-	// Steam Deck top 50
-	if err := runComponentTemplate(gm, c, "steam_deck_top_50"); err != nil {
-		return err
-	}
-
-	return nil
-} */
-
-/* func runComponentTemplate(gm goldmark.Markdown, c *config.Config, name string) error {
-	buf := new(bytes.Buffer)
-	md, err := utils.ReadFile(fmt.Sprintf("assets/components/%s.md", name))
-	if err != nil {
-		return err
-	}
-
-	switch name {
-	case "topnav":
-		md, err = runNavTemplate(md, c.Template.Params)
-	case "steam_deck_top_50":
-		md, err = runSteamDeckTop50Template(md, c.Template.Params)
-	default:
-		md, err = runTemplate(md, c.Template.Params)
-	}
-	if err != nil {
-		return err
-	}
-	if err := gm.Convert(md, buf); err != nil {
-		return err
-	}
-	c.Template.Params[name] = buf.String()
-
-	return nil
-} */
-
-func runTemplate(md []byte, p config.Params) ([]byte, error) {
-	tmpl, err := template.New("template").Parse(string(md))
-	if err != nil {
-		return nil, err
-	}
-
-	buffer := new(bytes.Buffer)
-	if err = tmpl.Execute(buffer, p); err != nil {
-		return nil, err
-	}
-
-	return buffer.Bytes(), nil
 }
 
 func getAssets(path string) ([]string, error) {
@@ -272,40 +175,6 @@ func makeHref(assetName, originalPath string) string {
 	return fmt.Sprintf("/%s/%s", hrefRoot, assetName)
 }
 
-// func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
-// 	funcs := map[string]interface{}{"makeHrefs": makeHrefs, "makeNavTitle": makeNavTitleFromHref}
-// 	tmpl, err := template.New("topnav").Funcs(funcs).Parse(string(md))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	buffer := new(bytes.Buffer)
-
-// 	if err = tmpl.Execute(buffer, p); err != nil {
-// 		return nil, err
-// 	}
-
-// 	return buffer.Bytes(), nil
-// }
-
-// TODO: Can we generalize component generation?
-/* func runSteamDeckTop50Template(md []byte, p config.Params) ([]byte, error) {
-	funcs := map[string]interface{}{"topFiftySteamDeckGames": steamapi.GetTopFiftySteamDeckGames}
-	tmpl, err := template.New("topFiftySteamDeckGames").Funcs(funcs).Parse(string(md))
-	if err != nil {
-		return nil, err
-	}
-
-	buffer := new(bytes.Buffer)
-
-	if err = tmpl.Execute(buffer, p); err != nil {
-		return nil, err
-	}
-
-	return buffer.Bytes(), nil
-}
-*/
-
 func getPages(path string, params map[string]interface{}) ([]Page, error) {
 	pages := []Page{}
 
@@ -346,17 +215,6 @@ func getPages(path string, params map[string]interface{}) ([]Page, error) {
 	}
 
 	return pages, nil
-}
-
-func newPage(title string, content []byte, template []byte, params map[string]interface{}, path string) (Page, error) {
-	return Page{
-		Title:     title,
-		Content:   content,
-		Template:  template,
-		Params:    params,
-		AssetPath: path,
-		BuildPath: strings.ReplaceAll(path, "assets", "build"),
-	}, nil
 }
 
 func makeNavTitleFromHref(assetHref string) string {

@@ -1,31 +1,19 @@
 {{ define "footer" }}
-<div class="columns">
-  <div class="column">
-    <a href="https://github.com/krmckone/lk-site" target="_blank" rel="noopener noreferrer">
-      {{ .githubIcon }}
-    </a>
-  </div>
-  <div class="column">
-    <a href="https://linkedin.com/in/krmckone" target="_blank" rel="noopener noreferrer">
-      {{ .linkedinIcon }}
-    </a>
-  </div>
-</div>
-
-<div class="columns">
-  <div class="column">
-    {{ .projectName }} by {{ .myName }}, always in development. {{ .currentYear }}.
-  </div>
-  <div class="column">
-    Last updated {{.currentEasternTime}}
-  </div>
-</div>
-
-<div class="columns">
-  <div class="column">
-    <a href="https://github.com/krmckone/lk-site/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">
-      License
-    </a>
-  </div>
+<p>
+  {{ .projectName }} by {{ .myName }}, {{ .subtitle }}. {{ .currentYear }}.
+  <br>
+  Last updated {{.currentEasternTime}}
+  <br>
+  <a href="https://github.com/krmckone/lk-site/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">
+    License
+  </a>
+</p>
+<div>
+  <a href="https://linkedin.com/in/krmckone" target="_blank" rel="noopener noreferrer">
+    {{ .linkedinIcon }}
+  </a>
+  <a href="https://github.com/krmckone/lk-site" target="_blank" rel="noopener noreferrer">
+    {{ .githubIcon }}
+  </a>
 </div>
 {{ end }}
