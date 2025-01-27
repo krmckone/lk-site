@@ -22,35 +22,38 @@ import (
 
 // Page holds data for templating a page
 type Page struct {
-	Title         string
-	Content       []byte
-	Template      []byte
-	Params        map[string]interface{}
-	BuildPathRoot string
+	Title     string
+	Content   []byte
+	Template  []byte
+	Params    map[string]interface{}
+	AssetPath string
+	BuildPath string
 }
 
 func (p *Page) String() string {
 	return fmt.Sprintf(
-		"Title: %s\nContent: %s\nTemplate: %s\nParams: %v\nBuildPathRoot: %s",
+		"Title: %s\nContent: %s\nTemplate: %s\nParams: %v\nAssetPath: %s\nBuildPath: %s",
 		p.Title,
 		string(p.Content),
 		string(p.Template),
 		p.Params,
-		p.BuildPathRoot,
+		p.AssetPath,
+		p.BuildPath,
 	)
 }
 
 // BuildSite is for building the site. This includes templating HTML with markdown and
 // putting images in the expected locations in the output
 func BuildSite() error {
-	utils.Clean("build")
-	utils.Mkdir("build")
-	utils.Mkdir("build/images")
-	utils.Mkdir("build/js")
-	utils.Mkdir("build/shaders")
-	utils.CopyFiles("assets/images", "build/images")
-	utils.CopyFiles("assets/js", "build/js")
-	utils.CopyFiles("assets/shaders", "build/shaders")
+	dirs := []string{"build", "build/images", "build/js", "build/shaders"}
+	for _, dir := range dirs {
+		utils.Clean(dir)
+		utils.Mkdir(dir)
+	}
+	assetDirs := []string{"images", "js", "shaders"}
+	for _, dir := range assetDirs {
+		utils.CopyAssetToBuild(dir)
+	}
 
 	gm := newGoldmark()
 
@@ -59,7 +62,7 @@ func BuildSite() error {
 		return err
 	}
 
-	pages, err := getPages("assets/pages", c.Template.Params, "")
+	pages, err := getPages("assets/pages", c.Template.Params)
 	if err != nil {
 		return err
 	}
@@ -72,21 +75,13 @@ func BuildSite() error {
 	}
 
 	for _, page := range pages {
-		mdTemplate, err := template.New("md").Parse(string(page.Content))
-		if err != nil {
+		// Using goldmark, convert the markdown to HTML
+		mdBuffer := bytes.Buffer{}
+		if err := gm.Convert(page.Content, &mdBuffer); err != nil {
 			return err
 		}
 
-		var templatedMD bytes.Buffer
-		if err := mdTemplate.Execute(&templatedMD, page.Params); err != nil {
-			return err
-		}
-
-		var mdBuffer bytes.Buffer
-		if err := gm.Convert(templatedMD.Bytes(), &mdBuffer); err != nil {
-			return err
-		}
-
+		// Setup the page params for template execution
 		pageParams := make(map[string]interface{})
 		for k, v := range c.Template.Params {
 			if k == "githubIcon" || k == "linkedinIcon" {
@@ -97,15 +92,20 @@ func BuildSite() error {
 		}
 		pageParams["main_content"] = template.HTML(mdBuffer.String())
 		pageParams["title"] = page.Title
-
-		outputPath := fmt.Sprintf("build/%s.html", page.Title)
-		f, err := os.Create(outputPath)
+		// Put the output file in the build dir that the ExecuteTemplate function expects
+		outputPath := filepath.Join(page.BuildPath, fmt.Sprintf("%s.html", page.Title))
+		if err := os.MkdirAll(filepath.Dir(outputPath), os.ModePerm); err != nil {
+			return err
+		}
+		file, err := os.Create(outputPath)
 		if err != nil {
 			return err
 		}
-		defer f.Close()
+		defer file.Close()
 
-		if err := tmpl.ExecuteTemplate(f, "base_page.html", pageParams); err != nil {
+		// Do the templating against the base template but with the individual page params
+		// Output will be written to file
+		if err := tmpl.ExecuteTemplate(file, "base_page.html", pageParams); err != nil {
 			return err
 		}
 	}
@@ -272,21 +272,21 @@ func makeHref(assetName, originalPath string) string {
 	return fmt.Sprintf("/%s/%s", hrefRoot, assetName)
 }
 
-func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
-	funcs := map[string]interface{}{"makeHrefs": makeHrefs, "makeNavTitle": makeNavTitleFromHref}
-	tmpl, err := template.New("topnav").Funcs(funcs).Parse(string(md))
-	if err != nil {
-		return nil, err
-	}
+// func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
+// 	funcs := map[string]interface{}{"makeHrefs": makeHrefs, "makeNavTitle": makeNavTitleFromHref}
+// 	tmpl, err := template.New("topnav").Funcs(funcs).Parse(string(md))
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	buffer := new(bytes.Buffer)
+// 	buffer := new(bytes.Buffer)
 
-	if err = tmpl.Execute(buffer, p); err != nil {
-		return nil, err
-	}
+// 	if err = tmpl.Execute(buffer, p); err != nil {
+// 		return nil, err
+// 	}
 
-	return buffer.Bytes(), nil
-}
+// 	return buffer.Bytes(), nil
+// }
 
 // TODO: Can we generalize component generation?
 /* func runSteamDeckTop50Template(md []byte, p config.Params) ([]byte, error) {
@@ -306,7 +306,7 @@ func runNavTemplate(md []byte, p config.Params) ([]byte, error) {
 }
 */
 
-func getPages(path string, params map[string]interface{}, buildPathRoot string) ([]Page, error) {
+func getPages(path string, params map[string]interface{}) ([]Page, error) {
 	pages := []Page{}
 
 	files, err := os.ReadDir(path)
@@ -314,10 +314,9 @@ func getPages(path string, params map[string]interface{}, buildPathRoot string) 
 		return pages, err
 	}
 
-	// TODO: Nested directories
 	for _, file := range files {
 		if file.IsDir() {
-			subPages, err := getPages(filepath.Join(path, file.Name()), params, buildPathRoot)
+			subPages, err := getPages(filepath.Join(path, file.Name()), params)
 			if err != nil {
 				return pages, err
 			}
@@ -333,13 +332,15 @@ func getPages(path string, params map[string]interface{}, buildPathRoot string) 
 			return pages, err
 		}
 
+		buildPath := strings.ReplaceAll(path, "assets/pages", "build")
 		// Create page with the markdown content
 		title := strings.TrimSuffix(file.Name(), ".md")
 		page := Page{
-			Title:         title,
-			Content:       content,
-			Params:        params,
-			BuildPathRoot: buildPathRoot,
+			Title:     title,
+			Content:   content,
+			Params:    params,
+			AssetPath: path,
+			BuildPath: buildPath,
 		}
 		pages = append(pages, page)
 	}
@@ -347,13 +348,14 @@ func getPages(path string, params map[string]interface{}, buildPathRoot string) 
 	return pages, nil
 }
 
-func newPage(title string, content []byte, template []byte, params map[string]interface{}, buildPathRoot string) (Page, error) {
+func newPage(title string, content []byte, template []byte, params map[string]interface{}, path string) (Page, error) {
 	return Page{
-		title,
-		content,
-		template,
-		params,
-		buildPathRoot,
+		Title:     title,
+		Content:   content,
+		Template:  template,
+		Params:    params,
+		AssetPath: path,
+		BuildPath: strings.ReplaceAll(path, "assets", "build"),
 	}, nil
 }
 

@@ -52,6 +52,10 @@ func GetCurrentYear() string {
 	return strconv.Itoa(time.Now().Year())
 }
 
+func CopyAssetToBuild(srcName string) {
+	CopyFiles("assets/"+srcName, "build/"+srcName)
+}
+
 // Copies files and directories from srcPath to dstPath
 func CopyFiles(srcPath, dstPath string) {
 	entries, err := os.ReadDir(srcPath)
