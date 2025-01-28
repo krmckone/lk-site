@@ -45,24 +45,14 @@ func (p *Page) String() string {
 // BuildSite is for building the site. This includes templating HTML with markdown and
 // putting images in the expected locations in the output
 func BuildSite() error {
-	dirs := []string{"build", "build/images", "build/js", "build/shaders"}
-	for _, dir := range dirs {
-		utils.Clean(dir)
-		utils.Mkdir(dir)
-	}
-	assetDirs := []string{"images", "js", "shaders"}
-	for _, dir := range assetDirs {
-		utils.CopyAssetToBuild(dir)
-	}
-
-	gm := newGoldmark()
+	utils.SetupBuild()
 
 	c, err := config.ReadConfig("configs/config.yml")
 	if err != nil {
 		return err
 	}
 
-	pages, err := getPages("assets/pages", c.Template.Params)
+	pages, err := getAssetPages("", c.Template.Params)
 	if err != nil {
 		return err
 	}
@@ -74,6 +64,7 @@ func BuildSite() error {
 		return err
 	}
 
+	gm := newGoldmark()
 	for _, page := range pages {
 		// Using goldmark, convert the markdown to HTML
 		mdBuffer := bytes.Buffer{}
@@ -84,11 +75,7 @@ func BuildSite() error {
 		// Setup the page params for template execution
 		pageParams := make(map[string]interface{})
 		for k, v := range c.Template.Params {
-			if k == "githubIcon" || k == "linkedinIcon" {
-				pageParams[k] = template.HTML(v.(string))
-			} else {
-				pageParams[k] = v
-			}
+			pageParams[k] = template.HTML(v.(string))
 		}
 		pageParams["main_content"] = template.HTML(mdBuffer.String())
 		pageParams["title"] = c.Template.Params["title"]
@@ -176,40 +163,51 @@ func makeHref(assetName, originalPath string) string {
 	return fmt.Sprintf("/%s/%s", hrefRoot, assetName)
 }
 
-func getPages(path string, params map[string]interface{}) ([]Page, error) {
+// a recursive function that returns all the pages in the directory
+// and all subdirectories. The path is a parameter because this
+// function is called recursively to get all the pages in the site underneath
+// "assets/pages". The first call of this function should be with the empty string
+// as path which represents the root of assets/pages
+func getAssetPages(path string, params map[string]interface{}) ([]Page, error) {
+	baseAssetPath := "assets/pages"
+	fullAssetPath := path
+	if !strings.HasPrefix(path, baseAssetPath) {
+		fullAssetPath = filepath.Join(baseAssetPath, path)
+	}
 	pages := []Page{}
 
-	files, err := os.ReadDir(path)
+	files, err := os.ReadDir(fullAssetPath)
 	if err != nil {
 		return pages, err
 	}
 
 	for _, file := range files {
 		if file.IsDir() {
-			subPages, err := getPages(filepath.Join(path, file.Name()), params)
+			subPages, err := getAssetPages(filepath.Join(fullAssetPath, file.Name()), params)
 			if err != nil {
 				return pages, err
 			}
 			pages = append(pages, subPages...)
 		}
+		// We only allow markdown files to be pages in this context
 		if !strings.HasSuffix(file.Name(), ".md") {
 			continue
 		}
 
 		// Read markdown content
-		content, err := os.ReadFile(filepath.Join(path, file.Name()))
+		content, err := os.ReadFile(filepath.Join(fullAssetPath, file.Name()))
 		if err != nil {
 			return pages, err
 		}
 
-		buildPath := strings.ReplaceAll(path, "assets/pages", "build")
-		// Create page with the markdown content
+		// Mark where the output for this page should be written
+		buildPath := strings.ReplaceAll(fullAssetPath, baseAssetPath, "build")
 		title := strings.TrimSuffix(file.Name(), ".md")
 		page := Page{
 			Title:     title,
 			Content:   content,
 			Params:    params,
-			AssetPath: path,
+			AssetPath: fullAssetPath,
 			BuildPath: buildPath,
 		}
 		pages = append(pages, page)

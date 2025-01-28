@@ -12,6 +12,21 @@ import (
 	"time"
 )
 
+// SetupBuild generates the directories for the output artifacts and puts
+// assets that do not need processing in the build directory; these assets
+// are referred to by the output artifacts
+func SetupBuild() {
+	dirs := []string{"build", "build/images", "build/js", "build/shaders"}
+	for _, dir := range dirs {
+		Clean(dir)
+		Mkdir(dir)
+	}
+	assetDirs := []string{"images", "js", "shaders"}
+	for _, dir := range assetDirs {
+		CopyAssetToBuild(dir)
+	}
+}
+
 // ReadFile wrapper for os.ReadFile
 func ReadFile(path string) ([]byte, error) {
 	return os.ReadFile(path)
