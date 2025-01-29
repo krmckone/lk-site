@@ -37,12 +37,12 @@ func TemplateSite() error {
 	}
 
 	funcs := getTemplateFuncs()
-	tmpl := template.New("base_page.html")
+	tmpl := template.New(filepath.Join(utils.MakePath("assets"), "base_page.html"))
 	tmpl, err = tmpl.Funcs(funcs).ParseFiles(
-		"assets/base_page.html",
-		"assets/header.html",
-		"assets/footer.html",
-		"assets/topnav.html",
+		filepath.Join(utils.MakePath("assets"), "base_page.html"),
+		filepath.Join(utils.MakePath("assets"), "header.html"),
+		filepath.Join(utils.MakePath("assets"), "footer.html"),
+		filepath.Join(utils.MakePath("assets"), "topnav.html"),
 	)
 	if err != nil {
 		return err
@@ -63,14 +63,13 @@ func TemplateSite() error {
 			c.Template.Params["title"].(string),
 		)
 		// Put the output file in the build dir that the ExecuteTemplate function expects
-		outputPath := getPageOutputPath(page)
 		if err := os.MkdirAll(
-			filepath.Dir(outputPath),
+			filepath.Dir(page.BuildPath),
 			os.ModePerm,
 		); err != nil {
 			return err
 		}
-		file, err := os.Create(outputPath)
+		file, err := os.Create(page.BuildPath)
 		if err != nil {
 			return err
 		}
@@ -84,10 +83,6 @@ func TemplateSite() error {
 	}
 
 	return nil
-}
-
-func getPageOutputPath(page page.Page) string {
-	return filepath.Join(page.BuildPath, fmt.Sprintf("%s.html", page.Title))
 }
 
 func setupPageParams(params map[string]interface{}, mainContent string, title string) map[string]interface{} {
@@ -125,7 +120,7 @@ func newGoldmark() goldmark.Markdown {
 func getAssets(path string) ([]string, error) {
 	var assets []string
 
-	dir, err := os.Open(path)
+	dir, err := os.Open(utils.MakePath(path))
 	if err != nil {
 		return assets, err
 	}
@@ -208,8 +203,11 @@ func getAssetPages(path string, params map[string]interface{}) ([]page.Page, err
 		}
 
 		// Mark where the output for this page should be written
-		buildPath := strings.ReplaceAll(fullAssetPath, baseAssetPath, "build")
 		title := strings.TrimSuffix(file.Name(), ".md")
+		buildPath := filepath.Join(
+			strings.ReplaceAll(fullAssetPath, baseAssetPath, utils.MakePath("build")),
+			fmt.Sprintf("%s.html", title),
+		)
 		page := page.Page{
 			Title:     title,
 			Content:   content,

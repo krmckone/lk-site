@@ -91,13 +91,13 @@ func TestCopyFiles(t *testing.T) {
 	if err := Mkdir(dstPath); err != nil {
 		t.Errorf("Unexpected error from Mkdir: %s", err)
 	}
-	if _, err := os.Stat(MakePath(dstPath)); !os.IsNotExist(err) {
-		t.Errorf("Expected %s to not exist and it does", MakePath(dstPath))
+	if _, err := os.Stat(MakePath(dstPath)); os.IsNotExist(err) {
+		t.Errorf("Expected %s to exist and it does not", MakePath(dstPath))
 	}
-
 	if err := CopyFiles(srcPath, dstPath); err != nil {
 		t.Errorf("Unexpected error from CopyFiles: %s", err)
 	}
+
 	dir, err := os.ReadDir(MakePath(dstPath))
 	if err != nil {
 		t.Errorf("unable to read dir %s: %s", MakePath(dstPath), err)
@@ -105,6 +105,7 @@ func TestCopyFiles(t *testing.T) {
 	if len(dir) != 1 {
 		t.Errorf("unexpected entry in dir %s: %s", MakePath(dstPath), dir)
 	}
+
 	nestedPath := filepath.Join(MakePath(dstPath), dir[0].Name())
 	nestedDir, err := os.ReadDir(nestedPath)
 	if err != nil {
@@ -118,5 +119,10 @@ func TestCopyFiles(t *testing.T) {
 	if !reflect.DeepEqual(expected, actual) {
 		t.Errorf("expected: %s, actual: %s", expected, actual)
 	}
-	Clean(dstPath)
+	if err := Clean(dstPath); err != nil {
+		t.Errorf("Unexpected error from Clean: %s", err)
+	}
+	if _, err := os.Stat(MakePath(dstPath)); !os.IsNotExist(err) {
+		t.Errorf("Expected %s to not exist and it does", MakePath(dstPath))
+	}
 }

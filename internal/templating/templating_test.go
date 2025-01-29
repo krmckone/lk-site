@@ -1,13 +1,18 @@
 package templating
 
 import (
+	"path/filepath"
+	"reflect"
 	"testing"
+
+	"github.com/krmckone/lk-site/internal/utils"
 )
 
 func TestTemplateSite(t *testing.T) {
 	if err := TemplateSite(); err != nil {
-		t.Errorf("Error: %s", err)
+		t.Errorf("Error from TemplateSite: %s", err)
 	}
+	utils.Clean(utils.MakePath("build"))
 }
 
 func TestMakeNavTitleFromHref(t *testing.T) {
@@ -58,7 +63,7 @@ func TestMakeHrefs(t *testing.T) {
 		expect []string
 	}{
 		{
-			"../../assets/test/pages",
+			filepath.Join(utils.MakePath("assets"), "test", "pages"),
 			[]string{"/pages/post_0", "/pages/post_1", "/pages/post_2"},
 		},
 	}
@@ -67,13 +72,8 @@ func TestMakeHrefs(t *testing.T) {
 		if err != nil {
 			t.Errorf("Unexpected error: %s", err)
 		}
-		if len(actual) != len(c.expect) {
+		if !reflect.DeepEqual(actual, c.expect) {
 			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
-		}
-		for i, v := range c.expect {
-			if v != actual[i] {
-				t.Errorf("Expected: %s, actual: %s", c.expect, actual)
-			}
 		}
 	}
 }
