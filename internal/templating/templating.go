@@ -1,4 +1,4 @@
-package templater
+package templating
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/krmckone/lk-site/internal/config"
+	"github.com/krmckone/lk-site/internal/page"
 	"github.com/krmckone/lk-site/internal/utils"
 	attributes "github.com/mdigger/goldmark-attributes"
 	"github.com/yuin/goldmark"
@@ -20,31 +21,9 @@ import (
 	"golang.org/x/text/language"
 )
 
-// Page holds data for templating a page
-type Page struct {
-	Title     string
-	Content   []byte
-	Template  []byte
-	Params    map[string]interface{}
-	AssetPath string
-	BuildPath string
-}
-
-func (p *Page) String() string {
-	return fmt.Sprintf(
-		"Title: %s\nContent: %s\nTemplate: %s\nParams: %v\nAssetPath: %s\nBuildPath: %s",
-		p.Title,
-		string(p.Content),
-		string(p.Template),
-		p.Params,
-		p.AssetPath,
-		p.BuildPath,
-	)
-}
-
 // BuildSite is for building the site. This includes templating HTML with markdown and
 // putting images in the expected locations in the output
-func BuildSite() error {
+func TemplateSite() error {
 	utils.SetupBuild()
 
 	c, err := config.ReadConfig("configs/config.yml")
@@ -57,9 +36,14 @@ func BuildSite() error {
 		return err
 	}
 
-	funcs := map[string]interface{}{"makeHrefs": makeHrefs, "makeNavTitle": makeNavTitleFromHref}
+	funcs := getTemplateFuncs()
 	tmpl := template.New("base_page.html")
-	tmpl, err = tmpl.Funcs(funcs).ParseFiles("assets/base_page.html", "assets/header.html", "assets/footer.html", "assets/topnav.html")
+	tmpl, err = tmpl.Funcs(funcs).ParseFiles(
+		"assets/base_page.html",
+		"assets/header.html",
+		"assets/footer.html",
+		"assets/topnav.html",
+	)
 	if err != nil {
 		return err
 	}
@@ -73,15 +57,17 @@ func BuildSite() error {
 		}
 
 		// Setup the page params for template execution
-		pageParams := make(map[string]interface{})
-		for k, v := range c.Template.Params {
-			pageParams[k] = template.HTML(v.(string))
-		}
-		pageParams["main_content"] = template.HTML(mdBuffer.String())
-		pageParams["title"] = c.Template.Params["title"]
+		pageParams := setupPageParams(
+			c.Template.Params,
+			mdBuffer.String(),
+			c.Template.Params["title"].(string),
+		)
 		// Put the output file in the build dir that the ExecuteTemplate function expects
-		outputPath := filepath.Join(page.BuildPath, fmt.Sprintf("%s.html", page.Title))
-		if err := os.MkdirAll(filepath.Dir(outputPath), os.ModePerm); err != nil {
+		outputPath := getPageOutputPath(page)
+		if err := os.MkdirAll(
+			filepath.Dir(outputPath),
+			os.ModePerm,
+		); err != nil {
 			return err
 		}
 		file, err := os.Create(outputPath)
@@ -98,6 +84,27 @@ func BuildSite() error {
 	}
 
 	return nil
+}
+
+func getPageOutputPath(page page.Page) string {
+	return filepath.Join(page.BuildPath, fmt.Sprintf("%s.html", page.Title))
+}
+
+func setupPageParams(params map[string]interface{}, mainContent string, title string) map[string]interface{} {
+	pageParams := map[string]interface{}{}
+	for k, v := range params {
+		pageParams[k] = template.HTML(v.(string))
+	}
+	pageParams["main_content"] = template.HTML(mainContent)
+	pageParams["title"] = title
+	return pageParams
+}
+
+func getTemplateFuncs() template.FuncMap {
+	return template.FuncMap{
+		"makeHrefs":    makeHrefs,
+		"makeNavTitle": makeNavTitleFromHref,
+	}
 }
 
 func newGoldmark() goldmark.Markdown {
@@ -168,13 +175,13 @@ func makeHref(assetName, originalPath string) string {
 // function is called recursively to get all the pages in the site underneath
 // "assets/pages". The first call of this function should be with the empty string
 // as path which represents the root of assets/pages
-func getAssetPages(path string, params map[string]interface{}) ([]Page, error) {
-	baseAssetPath := "assets/pages"
+func getAssetPages(path string, params map[string]interface{}) ([]page.Page, error) {
+	baseAssetPath := utils.MakePath("assets/pages")
 	fullAssetPath := path
 	if !strings.HasPrefix(path, baseAssetPath) {
 		fullAssetPath = filepath.Join(baseAssetPath, path)
 	}
-	pages := []Page{}
+	pages := []page.Page{}
 
 	files, err := os.ReadDir(fullAssetPath)
 	if err != nil {
@@ -203,7 +210,7 @@ func getAssetPages(path string, params map[string]interface{}) ([]Page, error) {
 		// Mark where the output for this page should be written
 		buildPath := strings.ReplaceAll(fullAssetPath, baseAssetPath, "build")
 		title := strings.TrimSuffix(file.Name(), ".md")
-		page := Page{
+		page := page.Page{
 			Title:     title,
 			Content:   content,
 			Params:    params,

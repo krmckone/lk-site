@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"path/filepath"
-	"runtime"
 
 	"github.com/krmckone/lk-site/internal/utils"
 	"gopkg.in/yaml.v2"
@@ -63,8 +62,6 @@ func ReadIcons(config Config) (Config, error) {
 }
 
 func readIcon(name interface{}) (string, error) {
-	_, b, _, _ := runtime.Caller(0)
-	absolutePath := filepath.Dir(b)
-	icon, err := utils.ReadFile(fmt.Sprintf("%s/../../assets/icons/%s", absolutePath, name))
+	icon, err := utils.ReadFile(filepath.Join("assets", "icons", name.(string)))
 	return string(icon), err
 }
