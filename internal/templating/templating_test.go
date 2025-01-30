@@ -1,6 +1,7 @@
 package templating
 
 import (
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -12,7 +13,15 @@ func TestTemplateSite(t *testing.T) {
 	if err := TemplateSite(); err != nil {
 		t.Errorf("Error from TemplateSite: %s", err)
 	}
-	utils.Clean(utils.MakePath("build"))
+	_, err := os.Stat(utils.MakePath("build"))
+	if os.IsNotExist(err) {
+		t.Errorf("build directory not created even though TemplateSite was called: %s", err)
+	} else if err != nil {
+		t.Errorf("Error checking if build directory exists: %s", err)
+	}
+	if err := utils.Clean(utils.MakePath("build")); err != nil {
+		t.Errorf("Unexpected error from Clean: %s", err)
+	}
 }
 
 func TestMakeNavTitleFromHref(t *testing.T) {

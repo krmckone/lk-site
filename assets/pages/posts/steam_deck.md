@@ -14,32 +14,33 @@ In summer of 2022 I was excited to get the steam deck for a few reasons. Since t
 
 ### What Kind of Games Work Well
 
-Games with native linux support work great with no tweaking necessary in general. Proton also enables tons of windows-built games to run just fine on Steam Deck. Some games over time lose proton compatibility through later updates but in general proton is a great bit of software in the linux gaming space. On that front though Valve has put in tons of work to make  all of the software around the controller configuration system powerful and exposes a ridiculous amount of options, particularly for the track pads and joy sticks. When I wanted to try a game without native controller support, I did have to take 10-20 minutes to mess with some options. When playing FPSs, I want to use the right track pad as either mouse or joystick-like-mouse. The sensitivity is important to get comfortable although I still don't have the perfect formula for this. I've been finding that most games are a little different in how they handle mouse input and things may get lost in translation through all of the software layers handling the steam deck input. Regardless, it's pretty easy to get a right track pad configured per game that works well. A lot of users also recommend a track pad + gyro setup for FPSs although I still have not really gotten the hang of that.
+Games with native linux support work great with no tweaking necessary in general. Proton also enables tons of windows-built games to run just fine on Steam Deck. Some games over time lose proton compatibility through later updates but in general proton is a great bit of software in the linux gaming space. On that front though Valve has put in tons of work to make all of the software around the controller configuration system powerful and exposes a ridiculous amount of options, particularly for the track pads and joy sticks. When I wanted to try a game without native controller support, I did have to take 10-20 minutes to mess with some options. When playing FPSs, I want to use the right track pad as either mouse or joystick-like-mouse. The sensitivity is important to get comfortable although I still don't have the perfect formula for this. I've been finding that most games are a little different in how they handle mouse input and things may get lost in translation through all of the software layers handling the steam deck input. Regardless, it's pretty easy to get a right track pad configured per game that works well. A lot of users also recommend a track pad + gyro setup for FPSs although I still have not really gotten the hang of that.
 
 ![steam deck lcd](../images/steam_deck/steam_deck_lcd.jpg "Steam Deck LCD")
 
-There's lots of open source plugins as well that you can get for your deck, like one that shows you information from the third party ProtonDB for each of your games. Sometimes user-provided data on ProtonDB is more accurate than Valve's internal testing, so this is useful to have handy. The steam deck's native resolution is 1280*800 at 16:10 so games that natively support this resolution will not cause any black bars around the deck's screen. As an alternative, you can set the in-game resolution to 1280x720 and use the deck's built in scaling mode to remove the black bars. This comes at the cost of stretching/distoring the image, though.
+There's lots of open source plugins as well that you can get for your deck, like one that shows you information from the third party ProtonDB for each of your games. Sometimes user-provided data on ProtonDB is more accurate than Valve's internal testing, so this is useful to have handy. The steam deck's native resolution is 1280\*800 at 16:10 so games that natively support this resolution will not cause any black bars around the deck's screen. As an alternative, you can set the in-game resolution to 1280x720 and use the deck's built in scaling mode to remove the black bars. This comes at the cost of stretching/distoring the image, though.
 
 Here is my summary/generalization for features that should allow the game to play well on Steam Deck:
 
-* Highly configurable graphics
-  * By default the game should pick settings that allow at minimum 30 FPS on average
-  * If the game does not default to good performance settings, it needs to allow you to tweak them
-* Supports native 16:10 resolution
-  * This avoids margins/black bars around the screen
-* Has either native Linux support or runs normally under Proton with minimal performance reduction
-  * Some games may require you to manually pick the Proton version in Steam before it will boot
-* Has native controller support
-  * This honestly is not a deal-breaker for me, but having native controller support is a huge QoL feature
-  * If the game does not have controller support, it should allow key remapping to facilitate a custom community controller configuration
-* For multiplayer games, supports a Linux version of any anti-cheat
-  * Games that only run under a native Windows environment due to their anti-cheat will not run as expected on Steam Deck
+- Highly configurable graphics
+  - By default the game should pick settings that allow at minimum 30 FPS on average
+  - If the game does not default to good performance settings, it needs to allow you to tweak them
+- Supports native 16:10 resolution
+  - This avoids margins/black bars around the screen
+- Has either native Linux support or runs normally under Proton with minimal performance reduction
+  - Some games may require you to manually pick the Proton version in Steam before it will boot
+- Has native controller support
+  - This honestly is not a deal-breaker for me, but having native controller support is a huge QoL feature
+  - If the game does not have controller support, it should allow key remapping to facilitate a custom community controller configuration
+- For multiplayer games, supports a Linux version of any anti-cheat
+  - Games that only run under a native Windows environment due to their anti-cheat will not run as expected on Steam Deck
 
 One additional feature of the steam deck that may go overlooked is the support for multiple controllers simultaneously, just like a console. For example, split screen in local-coop games should just work if you connect multiple controllers to the deck. This works great with the steam deck dock plugged into a TV.
 
 ## My top 50 most played games on steam deck
+
 #### This list is automatically updated twice daily
-{{.steam_deck_top_50}}
+{{ template "steamDeckTop50" }}
 
 ### What Kind of Games Do Not Work Well
 
@@ -47,12 +48,12 @@ Not all of the bullet points above should be given the same weight, but games th
 
 ### Things about the LCD that were not my favorite
 
-* It's a little heavy
-  * During play sessions of over thirty minutes, my arms and wrists would get tired unless I had something to rest the Steam Deck on
-* Battery life is not great but this also depends on game/graphics settings. There are also a lot of power-saving options in the three-dot menu
-* The LCD screen is not as good as the OLED version with worse colors/brightness and refresh rate. However, at LCD launch this was not a big deal with me
-* My left track pad was clicky but I think I just had a less-than-ideal quality of build. My guess is Valve's manufacturing process has improved in the lifetime of the LCD
-* My left trigger was squishy. I ended up taking the back plate off and using one of my wife's nail filers to reduce the height of the plastic around the left trigger housing. This fixed the squishy issue for me
+- It's a little heavy
+  - During play sessions of over thirty minutes, my arms and wrists would get tired unless I had something to rest the Steam Deck on
+- Battery life is not great but this also depends on game/graphics settings. There are also a lot of power-saving options in the three-dot menu
+- The LCD screen is not as good as the OLED version with worse colors/brightness and refresh rate. However, at LCD launch this was not a big deal with me
+- My left track pad was clicky but I think I just had a less-than-ideal quality of build. My guess is Valve's manufacturing process has improved in the lifetime of the LCD
+- My left trigger was squishy. I ended up taking the back plate off and using one of my wife's nail filers to reduce the height of the plastic around the left trigger housing. This fixed the squishy issue for me
 
 ### Why did I get an OLED
 
@@ -68,13 +69,13 @@ Some people online have been saying the OLED is at most a side-grade to the LCD.
 
 In my opinion the OLED is an upgrade in its own right. I am very pleased with the perceived decrease in weight on the OLED and I notice the difference over longer play sessions. If you already have an LCD and enjoy it then I would say stick with it, but I personally wanted the better screen and reduced weight. The improved Wifi and battery are also nice additions.
 
-* The screen is also a big upgrade in itself
-  * Colors are much nice and I can perceive the difference in brightness settings much better compared to the LCD
-  * I don't own a Switch OLED but I imagine the difference in those units' screens are similar enough
-* I find the physical feedback on the track pads much better on the OLED
-  * At the time of writing I'm not sure if they used different track pads for OLED but compared to my old LCD I enjoy using them much better.
-* Overall I also just like the color scheme better on the OLED
-  * The all-black joysticks are sharp and the subtle orange power button is also sick.
+- The screen is also a big upgrade in itself
+  - Colors are much nice and I can perceive the difference in brightness settings much better compared to the LCD
+  - I don't own a Switch OLED but I imagine the difference in those units' screens are similar enough
+- I find the physical feedback on the track pads much better on the OLED
+  - At the time of writing I'm not sure if they used different track pads for OLED but compared to my old LCD I enjoy using them much better.
+- Overall I also just like the color scheme better on the OLED
+  - The all-black joysticks are sharp and the subtle orange power button is also sick.
 
 ![steam deck OLED](../images/steam_deck/oled.jpg "Steam Deck OLED")
 

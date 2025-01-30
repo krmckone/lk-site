@@ -56,16 +56,23 @@ func MakePath(path string) string {
 // SetupBuild generates the directories for the output artifacts and puts
 // assets that do not need processing in the build directory; these assets
 // are referred to by the output artifacts
-func SetupBuild() {
+func SetupBuild() error {
 	dirs := []string{"build", "build/images", "build/js", "build/shaders"}
 	for _, dir := range dirs {
-		Clean(dir)
-		Mkdir(dir)
+		if err := Clean(dir); err != nil {
+			return fmt.Errorf("error cleaning directory %s: %s", dir, err)
+		}
+		if err := Mkdir(dir); err != nil {
+			return fmt.Errorf("error making directory %s: %s", dir, err)
+		}
 	}
 	assetDirs := []string{"images", "js", "shaders"}
 	for _, dir := range assetDirs {
-		CopyAssetToBuild(dir)
+		if err := CopyAssetToBuild(dir); err != nil {
+			return fmt.Errorf("error copying asset to build: %s", err)
+		}
 	}
+	return nil
 }
 
 // ReadFile wrapper for os.ReadFile
@@ -111,8 +118,8 @@ func GetCurrentYear() string {
 	return strconv.Itoa(time.Now().Year())
 }
 
-func CopyAssetToBuild(srcName string) {
-	CopyFiles(
+func CopyAssetToBuild(srcName string) error {
+	return CopyFiles(
 		filepath.Join("assets", srcName),
 		filepath.Join("build", srcName),
 	)

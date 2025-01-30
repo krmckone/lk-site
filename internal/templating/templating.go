@@ -11,6 +11,7 @@ import (
 
 	"github.com/krmckone/lk-site/internal/config"
 	"github.com/krmckone/lk-site/internal/page"
+	"github.com/krmckone/lk-site/internal/steamapi"
 	"github.com/krmckone/lk-site/internal/utils"
 	attributes "github.com/mdigger/goldmark-attributes"
 	"github.com/yuin/goldmark"
@@ -36,14 +37,24 @@ func TemplateSite() error {
 		return err
 	}
 
+	assetTemplateNames := []string{
+		"base_page.html",
+		"header.html",
+		"footer.html",
+		"topnav.html",
+		filepath.Join("components", "steam_deck_top_50.html"),
+	}
+	assetTemplatePaths := []string{}
+	for _, name := range assetTemplateNames {
+		assetTemplatePaths = append(
+			assetTemplatePaths,
+			filepath.Join(utils.MakePath("assets"), name),
+		)
+	}
+
 	funcs := getTemplateFuncs()
-	tmpl := template.New(filepath.Join(utils.MakePath("assets"), "base_page.html"))
-	tmpl, err = tmpl.Funcs(funcs).ParseFiles(
-		filepath.Join(utils.MakePath("assets"), "base_page.html"),
-		filepath.Join(utils.MakePath("assets"), "header.html"),
-		filepath.Join(utils.MakePath("assets"), "footer.html"),
-		filepath.Join(utils.MakePath("assets"), "topnav.html"),
-	)
+	tmpl := template.New("base_page.html")
+	tmpl, err = tmpl.Funcs(funcs).ParseFiles(assetTemplatePaths...)
 	if err != nil {
 		return err
 	}
@@ -97,9 +108,45 @@ func setupPageParams(params map[string]interface{}, mainContent string, title st
 
 func getTemplateFuncs() template.FuncMap {
 	return template.FuncMap{
-		"makeHrefs":    makeHrefs,
-		"makeNavTitle": makeNavTitleFromHref,
+		"makeHrefs":         makeHrefs,
+		"makeNavTitle":      makeNavTitleFromHref,
+		"getSteamDeckTop50": steamapi.GetSteamDeckTop50Wrapper,
 	}
+}
+
+func loadComponent(componentName string) (string, error) {
+	componentPath := filepath.Join(
+		utils.MakePath(
+			filepath.Join("assets", "components"),
+		),
+		componentName,
+	)
+	component, err := os.ReadFile(componentPath)
+	if err != nil {
+		return "", err
+	}
+	return string(component), nil
+}
+
+func runComponent(componentName string, params map[string]interface{}) (string, error) {
+	component, err := loadComponent(componentName)
+	if err != nil {
+		return "", err
+	}
+	tmpl := template.New(componentName)
+	tmpl, err = tmpl.Funcs(getTemplateFuncs()).Parse(component)
+	if err != nil {
+		return "", err
+	}
+	buf := bytes.Buffer{}
+	if err := tmpl.ExecuteTemplate(&buf, componentName, params); err != nil {
+		return "", err
+	}
+
+	mdBuffer := bytes.Buffer{}
+	gm := newGoldmark()
+	gm.Convert(buf.Bytes(), &mdBuffer)
+	return mdBuffer.String(), nil
 }
 
 func newGoldmark() goldmark.Markdown {

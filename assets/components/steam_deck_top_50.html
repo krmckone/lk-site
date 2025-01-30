@@ -1,0 +1,16 @@
+{{ define "steamDeckTop50" }}
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Steam Deck Time</th>
+    <th>Last Played</th>
+  </tr>
+  {{ range getSteamDeckTop50 }}
+  <tr>
+    <td><a href="https://store.steampowered.com/app/{{.AppId}}">{{.Name}}</a></td>
+    <td>{{.PlaytimeDeckForever}}</td>
+    <td>{{.FormattedTimeLastPlayed}}</td>
+  </tr>
+  {{ end }}
+</table>
+{{ end }}
