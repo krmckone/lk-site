@@ -1,48 +1,171 @@
 package utils
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
+	"slices"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
 
+func TestReadDir(t *testing.T) {
+	actual, err := ReadDir(filepath.Join("assets", "components"))
+	if err != nil {
+		t.Errorf("Unexpected error from ReadDir: %s", err)
+	}
+	expected := []string{filepath.Join("assets", "components", "steam_deck_top_50.html")}
+	for i, file := range actual {
+		if file != expected[i] {
+			t.Errorf("Expected: %s, actual: %s", expected[i], file)
+		}
+	}
+}
+
+func TestGetBasePageFiles(t *testing.T) {
+	actual := GetBasePageFiles()
+	expected := []string{
+		filepath.Join(MakePath("assets"), "base_page.html"),
+		filepath.Join(MakePath("assets"), "header.html"),
+		filepath.Join(MakePath("assets"), "footer.html"),
+		filepath.Join(MakePath("assets"), "topnav.html"),
+	}
+	for i, file := range actual {
+		if file != expected[i] {
+			t.Errorf("Expected: %s, actual: %s", expected[i], file)
+		}
+	}
+}
+
+func TestGetComponentFiles(t *testing.T) {
+	actual, err := GetComponentFiles()
+	if err != nil {
+		t.Errorf("Unexpected error from GetComponentFiles: %s", err)
+	}
+	expected := []string{
+		filepath.Join(MakePath("assets"), "components", "steam_deck_top_50.html"),
+	}
+	for i, file := range actual {
+		if file != expected[i] {
+			t.Errorf("Expected: %s, actual: %s", expected[i], file)
+		}
+	}
+}
+
+func TestGetRepoRoot(t *testing.T) {
+	t.Cleanup(func() {
+		if err := Clean(MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
+	expected, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Errorf("Unexpected error from filepath.Abs: %s", err)
+	}
+	actual := GetRepoRoot()
+	if !strings.HasPrefix(actual, expected) {
+		t.Errorf("Expected %s, got: %s", expected, actual)
+	}
+}
+
+func TestMakePath(t *testing.T) {
+	expected, err := filepath.Abs(filepath.Join("..", "..", "test"))
+	if err != nil {
+		t.Errorf("Unexpected error from filepath.Abs: %s", err)
+	}
+	actual := MakePath("test")
+	if actual != expected {
+		t.Errorf("Expected %s, got: %s", expected, actual)
+	}
+}
+
+func TestSetupBuild(t *testing.T) {
+	t.Cleanup(func() {
+		if err := Clean(MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
+	if err := SetupBuild(); err != nil {
+		t.Errorf("Unexpected error from SetupBuild: %s", err)
+	}
+	dir, err := os.ReadDir(MakePath("build"))
+	if err != nil {
+		t.Errorf("Unexpected error from os.ReadDir: %s", err)
+	}
+	expected := []string{"images", "js", "shaders"}
+	actual := []string{}
+	for _, d := range dir {
+		actual = append(actual, d.Name())
+	}
+	if !slices.Equal(expected, actual) {
+		t.Errorf("Expected %s, got: %s", expected, actual)
+	}
+}
+
 func TestWriteFile(t *testing.T) {
-	expect := "TEST0"
+	t.Cleanup(func() {
+		if err := Clean(MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
+	expectBody := "TEST0"
 	expectFile := "TEST_FILE.txt"
-	WriteFile(expectFile, []byte(expect))
+	if err := WriteFile(expectFile, []byte(expectBody)); err != nil {
+		t.Errorf("Unexpected error from WriteFile: %s", err)
+	}
 	b, err := ReadFile(expectFile)
 	if err != nil {
 		t.Errorf("Unexpected error from ReadFile: %s", err)
 	}
-	if string(b) != expect {
-		t.Errorf("Expected %s: %s, got: %s", expectFile, expect, string(b))
+	if string(b) != expectBody {
+		t.Errorf("Expected %s: %s, got: %s", expectFile, expectBody, string(b))
 	}
-	os.Remove(expectFile)
+	if err := os.Remove(MakePath(expectFile)); err != nil {
+		t.Errorf("Unexpected error from os.Remove: %s", err)
+	}
 }
 
 func TestMkdir(t *testing.T) {
 	expect := "test_path"
-	Mkdir(expect)
-	if _, err := os.Stat(expect); os.IsNotExist(err) {
-		t.Errorf("Expected %s to exist and it does not", expect)
+	if err := Mkdir(expect); err != nil {
+		t.Errorf("Unexpected error from Mkdir: %s", err)
 	}
-	os.Remove(expect)
+	if _, err := os.Stat(MakePath(expect)); os.IsNotExist(err) {
+		t.Errorf("Expected %s to exist and it does not", MakePath(expect))
+	}
+	if err := Clean(expect); err != nil {
+		t.Errorf("Unexpected error from Clean: %s", err)
+	}
+	if _, err := os.Stat(MakePath(expect)); !os.IsNotExist(err) {
+		t.Errorf("Expected %s to not exist and it does", MakePath(expect))
+	}
+	if err := os.RemoveAll(MakePath(expect)); err != nil {
+		t.Errorf("Unexpected error from os.RemoveAll: %s", err)
+	}
 }
 
 func TestClean(t *testing.T) {
 	expectPath := "test_path"
 	expectFile := "TEST_FILE.txt"
-	Mkdir(expectPath)
-	WriteFile(fmt.Sprintf("%s/%s", expectPath, expectFile), []byte{})
-	Clean(expectPath)
-	if _, err := os.Stat(expectFile); !os.IsNotExist(err) {
-		t.Errorf("Expected %s to not exist and it does", expectFile)
+	if err := Mkdir(expectPath); err != nil {
+		t.Errorf("Unexpected error from Mkdir: %s", err)
 	}
-	if _, err := os.Stat(expectPath); !os.IsNotExist(err) {
-		t.Errorf("Expected %s to not exist and it does", expectPath)
+	if err := WriteFile(filepath.Join(expectPath, expectFile), []byte{0, 1, 2}); err != nil {
+		t.Errorf("Unexpected error from WriteFile: %s", err)
+	}
+	if _, err := os.Stat(MakePath(filepath.Join(expectPath, expectFile))); os.IsNotExist(err) {
+		t.Errorf("Expected %s to exist and it does not", MakePath(expectPath))
+	}
+	if err := Clean(expectPath); err != nil {
+		t.Errorf("Unexpected error from Clean: %s", err)
+	}
+	if _, err := os.Stat(MakePath(filepath.Join(expectPath, expectFile))); !os.IsNotExist(err) {
+		t.Errorf("Expected %s to not exist and it does", MakePath(filepath.Join(expectPath, expectFile)))
+	}
+	if _, err := os.Stat(MakePath(expectPath)); !os.IsNotExist(err) {
+		t.Errorf("Expected %s to not exist and it does", MakePath(expectPath))
 	}
 }
 
@@ -66,25 +189,39 @@ func TestGetCurrentYear(t *testing.T) {
 }
 
 func TestCopyFiles(t *testing.T) {
+	t.Cleanup(func() {
+		if err := Clean(MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
+	srcPath := "assets/test"
 	dstPath := "build/test_path"
-	srcPath := "../../assets/test"
 
-	if _, err := os.Stat(dstPath); !os.IsNotExist(err) {
-		t.Errorf("Expected %s to not exist and it does", dstPath)
+	if err := Clean(dstPath); err != nil {
+		t.Errorf("Unexpected error from Clean: %s", err)
 	}
-	Mkdir(dstPath)
-	CopyFiles(srcPath, dstPath)
-	dir, err := os.ReadDir(dstPath)
+	if err := Mkdir(dstPath); err != nil {
+		t.Errorf("Unexpected error from Mkdir: %s", err)
+	}
+	if _, err := os.Stat(MakePath(dstPath)); os.IsNotExist(err) {
+		t.Errorf("Expected %s to exist and it does not", MakePath(dstPath))
+	}
+	if err := CopyFiles(srcPath, dstPath); err != nil {
+		t.Errorf("Unexpected error from CopyFiles: %s", err)
+	}
+
+	dir, err := os.ReadDir(MakePath(dstPath))
 	if err != nil {
-		t.Errorf("Unable to read dir %s", dstPath)
+		t.Errorf("unable to read dir %s: %s", MakePath(dstPath), err)
 	}
 	if len(dir) != 1 {
-		t.Errorf("Unexpected entry in dir %s", dstPath)
+		t.Errorf("unexpected entry in dir %s: %s", MakePath(dstPath), dir)
 	}
-	nested := fmt.Sprintf("%s/%s", dstPath, dir[0].Name())
-	nestedDir, err := os.ReadDir(nested)
+
+	nestedPath := filepath.Join(MakePath(dstPath), dir[0].Name())
+	nestedDir, err := os.ReadDir(nestedPath)
 	if err != nil {
-		t.Errorf("Unable to read dir %s", nested)
+		t.Errorf("unable to read dir %s: %s", nestedPath, err)
 	}
 	expected := []string{"post_0.md", "post_1.md", "post_2.md"}
 	actual := []string{}
@@ -94,5 +231,14 @@ func TestCopyFiles(t *testing.T) {
 	if !reflect.DeepEqual(expected, actual) {
 		t.Errorf("expected: %s, actual: %s", expected, actual)
 	}
-	Clean(dstPath)
+	if err := Clean(dstPath); err != nil {
+		t.Errorf("Unexpected error from Clean: %s", err)
+	}
+	if _, err := os.Stat(MakePath(dstPath)); !os.IsNotExist(err) {
+		t.Errorf("Expected %s to not exist and it does", MakePath(dstPath))
+	}
+
+	if err := Clean(MakePath(dstPath)); err != nil {
+		t.Errorf("Unexpected error from Clean: %s", err)
+	}
 }

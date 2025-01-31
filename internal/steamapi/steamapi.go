@@ -59,7 +59,7 @@ func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
 	return target.Response.Games, nil
 }
 
-func GetTopFiftySteamDeckGames() ([]SteamOwnedGame, error) {
+func GetSteamDeckTop50Games() ([]SteamOwnedGame, error) {
 	games, err := GetSteamOwnedGames()
 	if err != nil {
 		return []SteamOwnedGame{}, err
@@ -78,6 +78,14 @@ func GetTopFiftySteamDeckGames() ([]SteamOwnedGame, error) {
 		return cmp.Compare(b.PlaytimeDeckForever, a.PlaytimeDeckForever)
 	})
 	return steamDeckGames[:50], nil
+}
+
+func GetSteamDeckTop50Wrapper() []SteamOwnedGame {
+	games, err := GetSteamDeckTop50Games()
+	if err != nil {
+		return []SteamOwnedGame{}
+	}
+	return games
 }
 
 // For adding any additional processing/formatting to the owned games data

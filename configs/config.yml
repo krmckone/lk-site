@@ -3,6 +3,7 @@ template:
     title: "Kaleb McKone"
     projectName: "Portfolio"
     myName: "KRM"
+    subtitle: "Always in Development"
   styles:
     sheetURL: "https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css"
   icons:

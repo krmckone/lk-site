@@ -30,7 +30,7 @@
             Pages
           </div>
           <div class="navbar-dropdown">
-            {{.topnav}}
+            {{ template "topnav" . }}
           </div>
         </div>
         <a class="navbar-item" href="/about.html">
@@ -47,7 +47,7 @@
   <div class="hero is-small is-info">
     <div class="hero-body">
       <div class="content">
-        {{.header}}
+        {{ template "header" . }}
       </div>
     </div>
   </div>
@@ -67,7 +67,7 @@
 
   <footer class="footer">
     <div class="content has-text-centered">
-      {{.footer}}
+      {{ template "footer" . }}
     </div>
   </footer>
 </body>

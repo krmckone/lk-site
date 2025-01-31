@@ -8,34 +8,143 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
+	"sync"
 	"time"
 )
 
+var (
+	repoRoot     string
+	repoRootOnce sync.Once
+)
+
+// ReadDir returns the list of files in the directory, including subdirectories
+// starting with path as a relative path from the repo root
+func ReadDir(path string) ([]string, error) {
+	paths := []string{}
+	entries, err := os.ReadDir(MakePath(path))
+	if err != nil {
+		return []string{}, err
+	}
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			paths = append(paths, filepath.Join(path, entry.Name()))
+		} else {
+			subPaths, err := ReadDir(filepath.Join(path, entry.Name()))
+			if err != nil {
+				return []string{}, err
+			}
+			paths = append(paths, subPaths...)
+		}
+	}
+	return paths, nil
+}
+
+// GetBasePageFiles returns the list of base page files in the assets directory
+// This is statically defined and does not support subdirectories since these
+// should not change often
+func GetBasePageFiles() []string {
+	files := []string{
+		"base_page.html",
+		"header.html",
+		"footer.html",
+		"topnav.html",
+	}
+	for i, file := range files {
+		files[i] = filepath.Join(MakePath("assets"), file)
+	}
+	return files
+}
+
+// GetComponentFiles returns the list of component files in the assets/components directory
+func GetComponentFiles() ([]string, error) {
+	return ReadDir(filepath.Join(MakePath("assets"), "components"))
+}
+
+// GetRepoRoot returns the root directory of the repository. This value is used
+// to enable consistent relative paths for file copying/creating throughout the
+// templating process
+func GetRepoRoot() string {
+	repoRootOnce.Do(func() {
+		wd, err := os.Getwd()
+		if err != nil {
+			log.Fatalf("Error getting current working directory: %s", err)
+		}
+
+		for {
+			_, err := os.Stat(filepath.Join(wd, "go.mod"))
+			if err == nil {
+				repoRoot = wd
+				return
+			}
+			parent := filepath.Dir(wd)
+			if parent == wd {
+				log.Fatalf("could not find repo root")
+			}
+			wd = parent
+		}
+	})
+	return repoRoot
+}
+
+func MakePath(path string) string {
+	if strings.HasPrefix(path, GetRepoRoot()) {
+		return path
+	}
+	return filepath.Join(GetRepoRoot(), path)
+}
+
+// SetupBuild generates the directories for the output artifacts and puts
+// assets that do not need processing in the build directory; these assets
+// are referred to by the output artifacts
+func SetupBuild() error {
+	dirs := []string{"build", "build/images", "build/js", "build/shaders"}
+	for _, dir := range dirs {
+		if err := Clean(dir); err != nil {
+			return fmt.Errorf("error cleaning directory %s: %s", dir, err)
+		}
+		if err := Mkdir(dir); err != nil {
+			return fmt.Errorf("error making directory %s: %s", dir, err)
+		}
+	}
+	assetDirs := []string{"images", "js", "shaders"}
+	for _, dir := range assetDirs {
+		if err := CopyAssetToBuild(dir); err != nil {
+			return fmt.Errorf("error copying asset to build: %s", err)
+		}
+	}
+	return nil
+}
+
 // ReadFile wrapper for os.ReadFile
 func ReadFile(path string) ([]byte, error) {
-	return os.ReadFile(path)
+	return os.ReadFile(MakePath(path))
 }
 
 // WriteFile wrapper for ioutil.WriteFile
-func WriteFile(path string, b []byte) {
-	if err := os.WriteFile(path, b, 0644); err != nil {
-		log.Fatalf("Error writing file at %s: %s", path, err)
+func WriteFile(path string, b []byte) error {
+	if err := os.WriteFile(MakePath(path), b, 0644); err != nil {
+		return fmt.Errorf("error writing file at %s: %s", MakePath(path), err)
 	}
+	return nil
 }
 
 // Mkdir wrapper for os.MkdirAll
-func Mkdir(path string) {
-	if err := os.MkdirAll(path, 0755); err != nil {
-		log.Fatalf("Error making directory at %s: %s", path, err)
+func Mkdir(path string) error {
+	if err := os.MkdirAll(MakePath(path), 0755); err != nil {
+		return fmt.Errorf("error making directory at %s: %s", MakePath(path), err)
 	}
+	return nil
 }
 
 // Clean cleans the directory at path
-func Clean(path string) {
-	if err := os.RemoveAll(path); err != nil {
-		log.Fatalf("Error cleaning path %s: %s", path, err)
+func Clean(path string) error {
+	if err := os.RemoveAll(MakePath(path)); err != nil {
+		return fmt.Errorf("error cleaning path %s: %s", MakePath(path), err)
 	}
+	return nil
 }
 
 // Returns the current eastern timestamp
@@ -52,53 +161,78 @@ func GetCurrentYear() string {
 	return strconv.Itoa(time.Now().Year())
 }
 
+func CopyAssetToBuild(srcName string) error {
+	return CopyFiles(
+		filepath.Join("assets", srcName),
+		filepath.Join("build", srcName),
+	)
+}
+
 // Copies files and directories from srcPath to dstPath
-func CopyFiles(srcPath, dstPath string) {
-	entries, err := os.ReadDir(srcPath)
+func CopyFiles(srcPath, dstPath string) error {
+	repoSrcPath := srcPath
+	if !strings.HasPrefix(srcPath, GetRepoRoot()) {
+		repoSrcPath = MakePath(srcPath)
+	}
+	repoDstPath := dstPath
+	if !strings.HasPrefix(dstPath, GetRepoRoot()) {
+		repoDstPath = MakePath(dstPath)
+	}
+
+	entries, err := os.ReadDir(repoSrcPath)
 	if err != nil {
-		log.Fatalf("Error reading directory at %s: %s", srcPath, err)
+		return fmt.Errorf("error reading directory at %s: %s", repoSrcPath, err)
 	}
 	for _, entry := range entries {
 		if !entry.Type().IsDir() {
-			copyFile(
-				fmt.Sprintf("%s/%s", srcPath, entry.Name()),
-				fmt.Sprintf("%s/%s", dstPath, entry.Name()),
-			)
+			if err := copyFile(
+				filepath.Join(repoSrcPath, entry.Name()),
+				filepath.Join(repoDstPath, entry.Name()),
+			); err != nil {
+				return fmt.Errorf("error copying file from %s to %s: %s", MakePath(filepath.Join(repoSrcPath, entry.Name())), MakePath(filepath.Join(repoDstPath, entry.Name())), err)
+			}
 		} else {
-			Mkdir(fmt.Sprintf("%s/%s", dstPath, entry.Name()))
-			CopyFiles(
-				fmt.Sprintf("%s/%s", srcPath, entry.Name()),
-				fmt.Sprintf("%s/%s", dstPath, entry.Name()),
-			)
+			if err := Mkdir(filepath.Join(repoDstPath, entry.Name())); err != nil {
+				return fmt.Errorf("error making directory at %s: %s", MakePath(filepath.Join(repoDstPath, entry.Name())), err)
+			}
+			if err := CopyFiles(
+				filepath.Join(repoSrcPath, entry.Name()),
+				filepath.Join(repoDstPath, entry.Name()),
+			); err != nil {
+				return fmt.Errorf("error copying files from %s to %s: %s", MakePath(filepath.Join(repoSrcPath, entry.Name())), MakePath(filepath.Join(repoDstPath, entry.Name())), err)
+			}
 		}
 	}
+	return nil
 }
 
-func copyFile(srcPath, dstPath string) {
-	sourceFileStat, err := os.Stat(srcPath)
+func copyFile(srcPath, dstPath string) error {
+	sourceFileStat, err := os.Stat(MakePath(srcPath))
 	if err != nil {
-		log.Fatalf("Error getting description for file at %s: %s", srcPath, err)
+		return fmt.Errorf("error getting description for file at %s: %s", MakePath(srcPath), err)
 	}
 
 	if !sourceFileStat.Mode().IsRegular() {
-		log.Fatal(fmt.Errorf("%s is not a regular file", srcPath))
+		return fmt.Errorf("%s is not a regular file", MakePath(srcPath))
 	}
 
-	source, err := os.Open(srcPath)
+	source, err := os.Open(MakePath(srcPath))
 	if err != nil {
-		log.Fatalf("Error opening file at %s: %s", srcPath, err)
+		return fmt.Errorf("error opening file at %s: %s", MakePath(srcPath), err)
 	}
 	defer source.Close()
 
-	destination, err := os.Create(dstPath)
+	os.MkdirAll(filepath.Dir(MakePath(dstPath)), os.ModePerm)
+	destination, err := os.Create(MakePath(dstPath))
 	if err != nil {
-		log.Fatalf("Error creating file at %s: %s", dstPath, err)
+		return fmt.Errorf("error creating file at %s: %s", MakePath(dstPath), err)
 	}
 	defer destination.Close()
 	_, err = io.Copy(destination, source)
 	if err != nil {
-		log.Fatalf("Error copying file from %s to %s: %s", srcPath, dstPath, err)
+		return fmt.Errorf("error copying file from %s to %s: %s", MakePath(srcPath), MakePath(dstPath), err)
 	}
+	return nil
 }
 
 // Invokes HTTP GET on the URL and returns the body as a string

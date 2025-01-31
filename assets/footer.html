@@ -1,0 +1,19 @@
+{{ define "footer" }}
+<p>
+  {{ .projectName }} by {{ .myName }}, {{ .subtitle }}. {{ .currentYear }}.
+  <br>
+  Last updated {{.currentEasternTime}}
+  <br>
+  <a href="https://github.com/krmckone/lk-site/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">
+    License
+  </a>
+</p>
+<div>
+  <a href="https://linkedin.com/in/krmckone" target="_blank" rel="noopener noreferrer">
+    {{ .linkedinIcon }}
+  </a>
+  <a href="https://github.com/krmckone/lk-site" target="_blank" rel="noopener noreferrer">
+    {{ .githubIcon }}
+  </a>
+</div>
+{{ end }}

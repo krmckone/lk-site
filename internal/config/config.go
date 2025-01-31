@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"path/filepath"
-	"runtime"
 
 	"github.com/krmckone/lk-site/internal/utils"
 	"gopkg.in/yaml.v2"
@@ -22,7 +21,7 @@ type TemplateConfig struct {
 }
 
 // Params template variable parameters config
-type Params map[string]string
+type Params map[string]interface{}
 
 // StylesParams parameters for stylesheets
 type StylesParams struct {
@@ -62,9 +61,7 @@ func ReadIcons(config Config) (Config, error) {
 	return config, nil
 }
 
-func readIcon(name string) (string, error) {
-	_, b, _, _ := runtime.Caller(0)
-	absolutePath := filepath.Dir(b)
-	icon, err := utils.ReadFile(fmt.Sprintf("%s/../../assets/icons/%s", absolutePath, name))
+func readIcon(name interface{}) (string, error) {
+	icon, err := utils.ReadFile(filepath.Join("assets", "icons", name.(string)))
 	return string(icon), err
 }
