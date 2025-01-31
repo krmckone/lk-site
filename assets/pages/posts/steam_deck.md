@@ -41,7 +41,9 @@ One additional feature of the steam deck that may go overlooked is the support f
 
 #### This list is automatically updated twice daily
 
-<p>{{ template "steamDeckTop50" . }}</p>
+<div>
+  {{ template "steamDeckTop50" . }}
+</div>
 
 ### What Kind of Games Do Not Work Well
 
