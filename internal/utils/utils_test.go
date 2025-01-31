@@ -11,7 +11,55 @@ import (
 	"time"
 )
 
+func TestReadDir(t *testing.T) {
+	actual, err := ReadDir(filepath.Join("assets", "components"))
+	if err != nil {
+		t.Errorf("Unexpected error from ReadDir: %s", err)
+	}
+	expected := []string{filepath.Join("assets", "components", "steam_deck_top_50.html")}
+	for i, file := range actual {
+		if file != expected[i] {
+			t.Errorf("Expected: %s, actual: %s", expected[i], file)
+		}
+	}
+}
+
+func TestGetBasePageFiles(t *testing.T) {
+	actual := GetBasePageFiles()
+	expected := []string{
+		filepath.Join(MakePath("assets"), "base_page.html"),
+		filepath.Join(MakePath("assets"), "header.html"),
+		filepath.Join(MakePath("assets"), "footer.html"),
+		filepath.Join(MakePath("assets"), "topnav.html"),
+	}
+	for i, file := range actual {
+		if file != expected[i] {
+			t.Errorf("Expected: %s, actual: %s", expected[i], file)
+		}
+	}
+}
+
+func TestGetComponentFiles(t *testing.T) {
+	actual, err := GetComponentFiles()
+	if err != nil {
+		t.Errorf("Unexpected error from GetComponentFiles: %s", err)
+	}
+	expected := []string{
+		filepath.Join(MakePath("assets"), "components", "steam_deck_top_50.html"),
+	}
+	for i, file := range actual {
+		if file != expected[i] {
+			t.Errorf("Expected: %s, actual: %s", expected[i], file)
+		}
+	}
+}
+
 func TestGetRepoRoot(t *testing.T) {
+	t.Cleanup(func() {
+		if err := Clean(MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
 	expected, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Errorf("Unexpected error from filepath.Abs: %s", err)
@@ -34,6 +82,11 @@ func TestMakePath(t *testing.T) {
 }
 
 func TestSetupBuild(t *testing.T) {
+	t.Cleanup(func() {
+		if err := Clean(MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
 	if err := SetupBuild(); err != nil {
 		t.Errorf("Unexpected error from SetupBuild: %s", err)
 	}
@@ -49,12 +102,14 @@ func TestSetupBuild(t *testing.T) {
 	if !slices.Equal(expected, actual) {
 		t.Errorf("Expected %s, got: %s", expected, actual)
 	}
-	if err := Clean("build"); err != nil {
-		t.Errorf("Unexpected error from Clean: %s", err)
-	}
 }
 
 func TestWriteFile(t *testing.T) {
+	t.Cleanup(func() {
+		if err := Clean(MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
 	expectBody := "TEST0"
 	expectFile := "TEST_FILE.txt"
 	if err := WriteFile(expectFile, []byte(expectBody)); err != nil {
@@ -69,9 +124,6 @@ func TestWriteFile(t *testing.T) {
 	}
 	if err := os.Remove(MakePath(expectFile)); err != nil {
 		t.Errorf("Unexpected error from os.Remove: %s", err)
-	}
-	if err := Clean(MakePath(expectFile)); err != nil {
-		t.Errorf("Unexpected error from Clean: %s", err)
 	}
 }
 
@@ -137,6 +189,11 @@ func TestGetCurrentYear(t *testing.T) {
 }
 
 func TestCopyFiles(t *testing.T) {
+	t.Cleanup(func() {
+		if err := Clean(MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
 	srcPath := "assets/test"
 	dstPath := "build/test_path"
 

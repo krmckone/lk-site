@@ -1,6 +1,7 @@
 package templating
 
 import (
+	"html/template"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -10,6 +11,11 @@ import (
 )
 
 func TestTemplateSite(t *testing.T) {
+	t.Cleanup(func() {
+		if err := utils.Clean(utils.MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
 	if err := TemplateSite(); err != nil {
 		t.Errorf("Error from TemplateSite: %s", err)
 	}
@@ -19,12 +25,14 @@ func TestTemplateSite(t *testing.T) {
 	} else if err != nil {
 		t.Errorf("Error checking if build directory exists: %s", err)
 	}
-	if err := utils.Clean(utils.MakePath("build")); err != nil {
-		t.Errorf("Unexpected error from Clean: %s", err)
-	}
 }
 
 func TestMakeNavTitleFromHref(t *testing.T) {
+	t.Cleanup(func() {
+		if err := utils.Clean(utils.MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
 	cases := []struct {
 		in, expect string
 	}{
@@ -45,6 +53,11 @@ func TestMakeNavTitleFromHref(t *testing.T) {
 }
 
 func TestMakeHref(t *testing.T) {
+	t.Cleanup(func() {
+		if err := utils.Clean(utils.MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
 	cases := []struct {
 		assetName, originalPath, expect string
 	}{
@@ -67,6 +80,11 @@ func TestMakeHref(t *testing.T) {
 }
 
 func TestMakeHrefs(t *testing.T) {
+	t.Cleanup(func() {
+		if err := utils.Clean(utils.MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
 	cases := []struct {
 		path   string
 		expect []string
@@ -78,6 +96,36 @@ func TestMakeHrefs(t *testing.T) {
 	}
 	for _, c := range cases {
 		actual, err := makeHrefs(c.path)
+		if err != nil {
+			t.Errorf("Unexpected error: %s", err)
+		}
+		if !reflect.DeepEqual(actual, c.expect) {
+			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
+		}
+	}
+}
+
+func TestSetupPageParams(t *testing.T) {
+	t.Cleanup(func() {
+		if err := utils.Clean(utils.MakePath("build")); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
+	cases := []struct {
+		componentFiles []string
+		params         map[string]interface{}
+		mainContent    string
+		expect         map[string]interface{}
+	}{
+		{
+			[]string{filepath.Join(utils.MakePath("assets"), "components", "steam_deck_top_50.html")},
+			map[string]interface{}{"title": "Test Page"},
+			"<h1>Test Page</h1>",
+			map[string]interface{}{"title": "Test Page", "main_content": template.HTML("<h1>Test Page</h1>")},
+		},
+	}
+	for _, c := range cases {
+		actual, err := setupPageParams(c.componentFiles, c.params, c.mainContent)
 		if err != nil {
 			t.Errorf("Unexpected error: %s", err)
 		}

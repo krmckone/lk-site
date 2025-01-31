@@ -40,7 +40,8 @@ One additional feature of the steam deck that may go overlooked is the support f
 ## My top 50 most played games on steam deck
 
 #### This list is automatically updated twice daily
-{{ template "steamDeckTop50" }}
+
+<p>{{ template "steamDeckTop50" . }}</p>
 
 ### What Kind of Games Do Not Work Well
 

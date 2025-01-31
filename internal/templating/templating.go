@@ -37,19 +37,15 @@ func TemplateSite() error {
 		return err
 	}
 
-	assetTemplateNames := []string{
-		"base_page.html",
-		"header.html",
-		"footer.html",
-		"topnav.html",
-		filepath.Join("components", "steam_deck_top_50.html"),
-	}
-	assetTemplatePaths := []string{}
-	for _, name := range assetTemplateNames {
-		assetTemplatePaths = append(
-			assetTemplatePaths,
-			filepath.Join(utils.MakePath("assets"), name),
-		)
+	assetTemplatePaths := utils.GetBasePageFiles()
+
+	// The main content of each page can refer to other templates that are defined separately,
+	// so we need to template the main content as well against any component templates. We'll
+	// pass this list of component files to the setupPageParams function so that it can
+	// template the main content against them
+	componentFiles, err := utils.GetComponentFiles()
+	if err != nil {
+		return err
 	}
 
 	funcs := getTemplateFuncs()
@@ -68,11 +64,14 @@ func TemplateSite() error {
 		}
 
 		// Setup the page params for template execution
-		pageParams := setupPageParams(
+		pageParams, err := setupPageParams(
+			componentFiles,
 			c.Template.Params,
 			mdBuffer.String(),
-			c.Template.Params["title"].(string),
 		)
+		if err != nil {
+			return err
+		}
 		// Put the output file in the build dir that the ExecuteTemplate function expects
 		if err := os.MkdirAll(
 			filepath.Dir(page.BuildPath),
@@ -96,14 +95,26 @@ func TemplateSite() error {
 	return nil
 }
 
-func setupPageParams(params map[string]interface{}, mainContent string, title string) map[string]interface{} {
+func setupPageParams(componentFiles []string, params map[string]interface{}, mainContent string) (map[string]interface{}, error) {
 	pageParams := map[string]interface{}{}
 	for k, v := range params {
 		pageParams[k] = template.HTML(v.(string))
 	}
-	pageParams["main_content"] = template.HTML(mainContent)
-	pageParams["title"] = title
-	return pageParams
+	mainContentTemplate, err := template.Must(
+		template.New("main_content").Funcs(getTemplateFuncs()).Parse(mainContent),
+	).ParseFiles(
+		componentFiles...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	mainContentBuffer := bytes.Buffer{}
+	if err := mainContentTemplate.ExecuteTemplate(&mainContentBuffer, "main_content", pageParams); err != nil {
+		return nil, err
+	}
+	pageParams["main_content"] = template.HTML(mainContentBuffer.String())
+	pageParams["title"] = params["title"].(string)
+	return pageParams, nil
 }
 
 func getTemplateFuncs() template.FuncMap {
@@ -112,41 +123,6 @@ func getTemplateFuncs() template.FuncMap {
 		"makeNavTitle":      makeNavTitleFromHref,
 		"getSteamDeckTop50": steamapi.GetSteamDeckTop50Wrapper,
 	}
-}
-
-func loadComponent(componentName string) (string, error) {
-	componentPath := filepath.Join(
-		utils.MakePath(
-			filepath.Join("assets", "components"),
-		),
-		componentName,
-	)
-	component, err := os.ReadFile(componentPath)
-	if err != nil {
-		return "", err
-	}
-	return string(component), nil
-}
-
-func runComponent(componentName string, params map[string]interface{}) (string, error) {
-	component, err := loadComponent(componentName)
-	if err != nil {
-		return "", err
-	}
-	tmpl := template.New(componentName)
-	tmpl, err = tmpl.Funcs(getTemplateFuncs()).Parse(component)
-	if err != nil {
-		return "", err
-	}
-	buf := bytes.Buffer{}
-	if err := tmpl.ExecuteTemplate(&buf, componentName, params); err != nil {
-		return "", err
-	}
-
-	mdBuffer := bytes.Buffer{}
-	gm := newGoldmark()
-	gm.Convert(buf.Bytes(), &mdBuffer)
-	return mdBuffer.String(), nil
 }
 
 func newGoldmark() goldmark.Markdown {
@@ -218,7 +194,7 @@ func makeHref(assetName, originalPath string) string {
 // "assets/pages". The first call of this function should be with the empty string
 // as path which represents the root of assets/pages
 func getAssetPages(path string, params map[string]interface{}) ([]page.Page, error) {
-	baseAssetPath := utils.MakePath("assets/pages")
+	baseAssetPath := utils.MakePath(filepath.Join("assets", "pages"))
 	fullAssetPath := path
 	if !strings.HasPrefix(path, baseAssetPath) {
 		fullAssetPath = filepath.Join(baseAssetPath, path)

@@ -20,6 +20,49 @@ var (
 	repoRootOnce sync.Once
 )
 
+// ReadDir returns the list of files in the directory, including subdirectories
+// starting with path as a relative path from the repo root
+func ReadDir(path string) ([]string, error) {
+	paths := []string{}
+	entries, err := os.ReadDir(MakePath(path))
+	if err != nil {
+		return []string{}, err
+	}
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			paths = append(paths, filepath.Join(path, entry.Name()))
+		} else {
+			subPaths, err := ReadDir(filepath.Join(path, entry.Name()))
+			if err != nil {
+				return []string{}, err
+			}
+			paths = append(paths, subPaths...)
+		}
+	}
+	return paths, nil
+}
+
+// GetBasePageFiles returns the list of base page files in the assets directory
+// This is statically defined and does not support subdirectories since these
+// should not change often
+func GetBasePageFiles() []string {
+	files := []string{
+		"base_page.html",
+		"header.html",
+		"footer.html",
+		"topnav.html",
+	}
+	for i, file := range files {
+		files[i] = filepath.Join(MakePath("assets"), file)
+	}
+	return files
+}
+
+// GetComponentFiles returns the list of component files in the assets/components directory
+func GetComponentFiles() ([]string, error) {
+	return ReadDir(filepath.Join(MakePath("assets"), "components"))
+}
+
 // GetRepoRoot returns the root directory of the repository. This value is used
 // to enable consistent relative paths for file copying/creating throughout the
 // templating process
