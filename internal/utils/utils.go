@@ -141,24 +141,8 @@ func Mkdir(path string) error {
 
 // Clean cleans the directory at path
 func Clean(path string) error {
-	fullPath := MakePath(path)
-	_, err := os.Stat(fullPath)
-	if os.IsNotExist(err) {
-		return nil
-	}
-	if err != nil {
-		return fmt.Errorf("error getting file info at %s: %s", fullPath, err)
-	}
-	fmt.Printf("Cleaning path: %s\n", fullPath)
-	entries, err := os.ReadDir(fullPath)
-	if err != nil {
-		return fmt.Errorf("error reading directory at %s: %s", fullPath, err)
-	}
-	for _, entry := range entries {
-		fmt.Printf("Found entry: %s\n", entry.Name())
-	}
 	if err := os.RemoveAll(MakePath(path)); err != nil {
-		return fmt.Errorf("error cleaning path %s: %s", fullPath, err)
+		return fmt.Errorf("error cleaning path %s: %s", MakePath(path), err)
 	}
 	return nil
 }

@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/gofrs/flock"
 )
 
 func TestReadDir(t *testing.T) {
@@ -99,11 +101,23 @@ func TestMakePath(t *testing.T) {
 }
 
 func TestSetupBuild(t *testing.T) {
+	lock := flock.New(MakePath("build"))
+	defer lock.Unlock()
+
+	locked, err := lock.TryLock()
+	if err != nil {
+		t.Errorf("Unexpected error from TryLock: %s", err)
+	}
+	if !locked {
+		t.Errorf("Expected lock to be acquired")
+	}
+
 	t.Cleanup(func() {
 		if err := Clean(MakePath("build")); err != nil {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
+
 	if err := SetupBuild(); err != nil {
 		t.Errorf("Unexpected error from SetupBuild: %s", err)
 	}
