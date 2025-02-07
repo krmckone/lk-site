@@ -5,6 +5,7 @@ on:
     - cron: "25 4,21 * * *" # Runs at 12:25AM and 5:25PM EST daily. The hours reflect UTC time
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build-and-test:
