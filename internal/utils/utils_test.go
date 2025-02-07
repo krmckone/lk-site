@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/gofrs/flock"
 )
 
 func TestReadDir(t *testing.T) {
@@ -57,7 +59,7 @@ func TestGetComponentFiles(t *testing.T) {
 func TestGetRepoRoot(t *testing.T) {
 	t.Cleanup(func() {
 		if err := Clean(MakePath("build")); err != nil {
-			t.Errorf("Unexpected error from Clean: %s", err)
+			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
 	expected, err := filepath.Abs(filepath.Join("..", ".."))
@@ -70,23 +72,52 @@ func TestGetRepoRoot(t *testing.T) {
 	}
 }
 
+func makeExpectedPath(input string) (string, error) {
+	return filepath.Abs(filepath.Join("..", "..", input))
+}
+
 func TestMakePath(t *testing.T) {
-	expected, err := filepath.Abs(filepath.Join("..", "..", "test"))
-	if err != nil {
-		t.Errorf("Unexpected error from filepath.Abs: %s", err)
+
+	cases := []struct {
+		input    string
+		expected string
+	}{}
+	for _, input := range []string{"test", "test/test"} {
+		expected, err := makeExpectedPath(input)
+		if err != nil {
+			t.Errorf("Unexpected error from makeExpected: %s", err)
+		}
+		cases = append(cases, struct {
+			input    string
+			expected string
+		}{input: input, expected: expected})
 	}
-	actual := MakePath("test")
-	if actual != expected {
-		t.Errorf("Expected %s, got: %s", expected, actual)
+	for _, c := range cases {
+		actual := MakePath(c.input)
+		if actual != c.expected {
+			t.Errorf("Expected %s, got: %s", c.expected, actual)
+		}
 	}
 }
 
 func TestSetupBuild(t *testing.T) {
+	lock := flock.New(MakePath("build"))
+	defer lock.Unlock()
+
+	locked, err := lock.TryLock()
+	if err != nil {
+		t.Errorf("Unexpected error from TryLock: %s", err)
+	}
+	if !locked {
+		t.Errorf("Expected lock to be acquired")
+	}
+
 	t.Cleanup(func() {
 		if err := Clean(MakePath("build")); err != nil {
-			t.Errorf("Unexpected error from Clean: %s", err)
+			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
+
 	if err := SetupBuild(); err != nil {
 		t.Errorf("Unexpected error from SetupBuild: %s", err)
 	}
@@ -107,7 +138,7 @@ func TestSetupBuild(t *testing.T) {
 func TestWriteFile(t *testing.T) {
 	t.Cleanup(func() {
 		if err := Clean(MakePath("build")); err != nil {
-			t.Errorf("Unexpected error from Clean: %s", err)
+			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
 	expectBody := "TEST0"
@@ -191,7 +222,7 @@ func TestGetCurrentYear(t *testing.T) {
 func TestCopyFiles(t *testing.T) {
 	t.Cleanup(func() {
 		if err := Clean(MakePath("build")); err != nil {
-			t.Errorf("Unexpected error from Clean: %s", err)
+			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
 	srcPath := "assets/test"
