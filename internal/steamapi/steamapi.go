@@ -32,7 +32,7 @@ type SteamOwnedGamesResponse struct {
 	}
 }
 
-func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
+func GetSteamOwnedGames(steamId string) ([]SteamOwnedGame, error) {
 	steam_api_key, present := os.LookupEnv("STEAM_API_KEY")
 	if !present || steam_api_key == "" {
 		return []SteamOwnedGame{}, fmt.Errorf("STEAM_API_KEY variable not present in env")
@@ -43,7 +43,8 @@ func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
 	}
 	params := url.Values{}
 	params.Add("key", steam_api_key)
-	params.Add("steamid", "76561197988460908") // me
+	// params.Add("steamid", "76561197988460908")
+	params.Add("steamid", steamId)
 	params.Add("include_appinfo", "true")
 	params.Add("include_extended_appinfo", "true")
 	params.Add("include_played_free_games", "true")
@@ -59,8 +60,8 @@ func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
 	return target.Response.Games, nil
 }
 
-func GetSteamDeckTop50Games() ([]SteamOwnedGame, error) {
-	games, err := GetSteamOwnedGames()
+func GetSteamDeckTop50Games(steamId string) ([]SteamOwnedGame, error) {
+	games, err := GetSteamOwnedGames(steamId)
 	if err != nil {
 		return []SteamOwnedGame{}, err
 	}
@@ -80,8 +81,8 @@ func GetSteamDeckTop50Games() ([]SteamOwnedGame, error) {
 	return steamDeckGames[:50], nil
 }
 
-func GetSteamDeckTop50Wrapper() []SteamOwnedGame {
-	games, err := GetSteamDeckTop50Games()
+func GetSteamDeckTop50Wrapper(steamId string) []SteamOwnedGame {
+	games, err := GetSteamDeckTop50Games(steamId)
 	if err != nil {
 		return []SteamOwnedGame{}
 	}
