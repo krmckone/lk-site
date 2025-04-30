@@ -21,7 +21,7 @@ Other great sources that I've been pulling together that I want to leverage on m
 * https://github.com/luisdnsantos/awesome-computer-graphics
 * https://github.com/prographon/graphics-developer-roadmap
 * https://pbr-book.org/3ed-2018/contents
-* https://antongerdelan.net/opengl/index.html#onlinetuts
+* https://antongerdelan.net/opengl/index.html
 * https://catlikecoding.com/unity/tutorials/
 * https://www.youtube.com/watch?v=O-2viBhLTqI
 * https://fgiesen.wordpress.com/2011/07/09/a-trip-through-the-graphics-pipeline-2011-index/
