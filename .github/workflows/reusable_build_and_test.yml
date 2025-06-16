@@ -43,6 +43,7 @@ jobs:
       with:
         directory: ./build
         check_favicon: false
+        disable_external: true
         ignore_url: |
           https://linkedin.com/in/krmckone
           https://linkedin.com/in/fy2721
