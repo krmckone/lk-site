@@ -24,8 +24,8 @@ import (
 
 // BuildSite is for building the site. This includes templating HTML with markdown and
 // putting images in the expected locations in the output
-func TemplateSite() error {
-	utils.SetupBuild()
+func TemplateSite(runtime utils.RuntimeConfig) error {
+	utils.SetupBuild(runtime)
 
 	c, err := config.ReadConfig("configs/config.yml")
 	if err != nil {
@@ -37,13 +37,13 @@ func TemplateSite() error {
 		return err
 	}
 
-	assetTemplatePaths := utils.GetBasePageFiles()
+	assetTemplatePaths := utils.GetBasePageFiles(runtime)
 
 	// The main content of each page can refer to other templates that are defined separately,
 	// so we need to template the main content as well against any component templates. We'll
 	// pass this list of component files to the setupPageParams function so that it can
 	// template the main content against them
-	componentFiles, err := utils.GetComponentFiles()
+	componentFiles, err := utils.GetComponentFiles(runtime)
 	if err != nil {
 		return err
 	}

@@ -15,6 +15,14 @@ import (
 	"time"
 )
 
+// Parameterizes specific values needed to load assets and configuration
+// at runtime
+type RuntimeConfig struct {
+	AssetsPath  string
+	ConfigsPath string
+	BuildPath   string
+}
+
 var (
 	repoRoot     string
 	repoRootOnce sync.Once
@@ -45,7 +53,7 @@ func ReadDir(path string) ([]string, error) {
 // GetBasePageFiles returns the list of base page files in the assets directory
 // This is statically defined and does not support subdirectories since these
 // should not change often
-func GetBasePageFiles() []string {
+func GetBasePageFiles(runtime RuntimeConfig) []string {
 	files := []string{
 		"base_page.html",
 		"header.html",
@@ -53,14 +61,14 @@ func GetBasePageFiles() []string {
 		"topnav.html",
 	}
 	for i, file := range files {
-		files[i] = filepath.Join(MakePath("assets"), file)
+		files[i] = filepath.Join(MakePath(runtime.AssetsPath), file)
 	}
 	return files
 }
 
 // GetComponentFiles returns the list of component files in the assets/components directory
-func GetComponentFiles() ([]string, error) {
-	return ReadDir(filepath.Join(MakePath("assets"), "components"))
+func GetComponentFiles(runtime RuntimeConfig) ([]string, error) {
+	return ReadDir(filepath.Join(MakePath(runtime.AssetsPath), "components"))
 }
 
 // GetRepoRoot returns the root directory of the repository. This value is used
@@ -99,9 +107,13 @@ func MakePath(path string) string {
 // SetupBuild generates the directories for the output artifacts and puts
 // assets that do not need processing in the build directory; these assets
 // are referred to by the output artifacts
-func SetupBuild() error {
-	dirs := []string{"build", "build/images", "build/js", "build/shaders"}
-	for _, dir := range dirs {
+func SetupBuild(runtime RuntimeConfig) error {
+	assetDirs := []string{"images", "js", "shaders"}
+	dirs := []string{}
+	for _, dir := range assetDirs {
+		dirs = append(dirs, filepath.Join(runtime.BuildPath, dir))
+	}
+	for _, dir := range dirs { // Maybe we could combine these loops
 		if err := Clean(dir); err != nil {
 			return fmt.Errorf("error cleaning directory %s: %s", dir, err)
 		}
@@ -109,9 +121,8 @@ func SetupBuild() error {
 			return fmt.Errorf("error making directory %s: %s", dir, err)
 		}
 	}
-	assetDirs := []string{"images", "js", "shaders"}
 	for _, dir := range assetDirs {
-		if err := CopyAssetToBuild(dir); err != nil {
+		if err := CopyAssetToBuild(runtime, dir); err != nil {
 			return fmt.Errorf("error copying asset to build: %s", err)
 		}
 	}
@@ -161,10 +172,10 @@ func GetCurrentYear() string {
 	return strconv.Itoa(time.Now().Year())
 }
 
-func CopyAssetToBuild(srcName string) error {
+func CopyAssetToBuild(runtime RuntimeConfig, srcName string) error {
 	return CopyFiles(
-		filepath.Join("assets", srcName),
-		filepath.Join("build", srcName),
+		filepath.Join(runtime.AssetsPath, srcName),
+		filepath.Join(runtime.BuildPath, srcName),
 	)
 }
 

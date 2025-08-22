@@ -13,6 +13,14 @@ import (
 	"github.com/gofrs/flock"
 )
 
+func NewTestRuntime() RuntimeConfig {
+	return RuntimeConfig{
+		AssetsPath:  "test/assets",
+		BuildPath:   "test/build",
+		ConfigsPath: "test/configs",
+	}
+}
+
 func TestReadDir(t *testing.T) {
 	actual, err := ReadDir(filepath.Join("assets", "components"))
 	if err != nil {
@@ -27,12 +35,13 @@ func TestReadDir(t *testing.T) {
 }
 
 func TestGetBasePageFiles(t *testing.T) {
-	actual := GetBasePageFiles()
+	runtime := NewTestRuntime()
+	actual := GetBasePageFiles(runtime)
 	expected := []string{
-		filepath.Join(MakePath("assets"), "base_page.html"),
-		filepath.Join(MakePath("assets"), "header.html"),
-		filepath.Join(MakePath("assets"), "footer.html"),
-		filepath.Join(MakePath("assets"), "topnav.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "base_page.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "header.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "footer.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "topnav.html"),
 	}
 	for i, file := range actual {
 		if file != expected[i] {
@@ -42,12 +51,13 @@ func TestGetBasePageFiles(t *testing.T) {
 }
 
 func TestGetComponentFiles(t *testing.T) {
-	actual, err := GetComponentFiles()
+	runtime := NewTestRuntime()
+	actual, err := GetComponentFiles(runtime)
 	if err != nil {
 		t.Errorf("Unexpected error from GetComponentFiles: %s", err)
 	}
 	expected := []string{
-		filepath.Join(MakePath("assets"), "components", "steam_deck_top_50.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "components", "steam_deck_top_50.html"),
 	}
 	for i, file := range actual {
 		if file != expected[i] {
@@ -57,8 +67,9 @@ func TestGetComponentFiles(t *testing.T) {
 }
 
 func TestGetRepoRoot(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := Clean(MakePath("build")); err != nil {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
@@ -101,7 +112,8 @@ func TestMakePath(t *testing.T) {
 }
 
 func TestSetupBuild(t *testing.T) {
-	lock := flock.New(MakePath("build"))
+	runtime := NewTestRuntime()
+	lock := flock.New(MakePath(runtime.BuildPath))
 	defer lock.Unlock()
 
 	locked, err := lock.TryLock()
@@ -113,15 +125,15 @@ func TestSetupBuild(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		if err := Clean(MakePath("build")); err != nil {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
 
-	if err := SetupBuild(); err != nil {
+	if err := SetupBuild(runtime); err != nil {
 		t.Errorf("Unexpected error from SetupBuild: %s", err)
 	}
-	dir, err := os.ReadDir(MakePath("build"))
+	dir, err := os.ReadDir(MakePath(runtime.BuildPath))
 	if err != nil {
 		t.Errorf("Unexpected error from os.ReadDir: %s", err)
 	}
@@ -136,8 +148,9 @@ func TestSetupBuild(t *testing.T) {
 }
 
 func TestWriteFile(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := Clean(MakePath("build")); err != nil {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
@@ -220,13 +233,14 @@ func TestGetCurrentYear(t *testing.T) {
 }
 
 func TestCopyFiles(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := Clean(MakePath("build")); err != nil {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
-	srcPath := "assets/test"
-	dstPath := "build/test_path"
+	srcPath := filepath.Join(runtime.AssetsPath, "test")
+	dstPath := filepath.Join(runtime.BuildPath, "test_path")
 
 	if err := Clean(dstPath); err != nil {
 		t.Errorf("Unexpected error from Clean: %s", err)
