@@ -1,0 +1,13 @@
+environment:
+  params:
+    steamId: "some_id"
+template:
+  params:
+    title: "Tester"
+    projectName: "Unit Tests"
+    subtitle: "Always Testing"
+  styles:
+    sheetURL: "https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css"
+  icons:
+    github: "github.svg"
+    linkedin: "linkedin.svg"

@@ -11,26 +11,36 @@ import (
 	"github.com/krmckone/lk-site/internal/utils"
 )
 
+func NewTestRuntime() utils.RuntimeConfig {
+	return utils.RuntimeConfig{
+		AssetsPath:  "test/assets",
+		BuildPath:   "test/build",
+		ConfigsPath: "test/configs",
+	}
+}
+
 func TestTemplateSite(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := utils.Clean(utils.MakePath("build")); err != nil {
+		if err := utils.Clean(utils.MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Unexpected error from Clean: %s", err)
 		}
 	})
-	if err := TemplateSite(); err != nil {
+	if err := TemplateSite(runtime); err != nil {
 		t.Errorf("Error from TemplateSite: %s", err)
 	}
-	_, err := os.Stat(utils.MakePath("build"))
+	_, err := os.Stat(utils.MakePath(runtime.BuildPath))
 	if os.IsNotExist(err) {
-		t.Errorf("build directory not created even though TemplateSite was called: %s", err)
+		t.Errorf("%s directory not created even though TemplateSite was called: %s", runtime.BuildPath, err)
 	} else if err != nil {
-		t.Errorf("Error checking if build directory exists: %s", err)
+		t.Errorf("Error checking if %s directory exists: %s", runtime.BuildPath, err)
 	}
 }
 
 func TestMakeNavTitleFromHref(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := utils.Clean(utils.MakePath("build")); err != nil {
+		if err := utils.Clean(utils.MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Unexpected error from Clean: %s", err)
 		}
 	})
@@ -54,8 +64,9 @@ func TestMakeNavTitleFromHref(t *testing.T) {
 }
 
 func TestMakeHref(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := utils.Clean(utils.MakePath("build")); err != nil {
+		if err := utils.Clean(utils.MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Unexpected error from Clean: %s", err)
 		}
 	})
@@ -81,8 +92,9 @@ func TestMakeHref(t *testing.T) {
 }
 
 func TestMakeHrefs(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := utils.Clean(utils.MakePath("build")); err != nil {
+		if err := utils.Clean(utils.MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Unexpected error from Clean: %s", err)
 		}
 	})
@@ -91,7 +103,7 @@ func TestMakeHrefs(t *testing.T) {
 		expect []string
 	}{
 		{
-			filepath.Join(utils.MakePath("assets"), "test", "pages"),
+			filepath.Join(utils.MakePath(runtime.AssetsPath), "test", "pages"),
 			[]string{"/pages/post_0", "/pages/post_1", "/pages/post_2"},
 		},
 	}
@@ -107,8 +119,9 @@ func TestMakeHrefs(t *testing.T) {
 }
 
 func TestSetupPageParams(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := utils.Clean(utils.MakePath("build")); err != nil {
+		if err := utils.Clean(utils.MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Unexpected error from Clean: %s", err)
 		}
 	})
@@ -119,7 +132,7 @@ func TestSetupPageParams(t *testing.T) {
 		expect         map[string]interface{}
 	}{
 		{
-			[]string{filepath.Join(utils.MakePath("assets"), "components", "steam_deck_top_50.html")},
+			[]string{filepath.Join(utils.MakePath(runtime.AssetsPath), "components", "steam_deck_top_50.html")},
 			config.Config{
 				Env: config.EnvConfig{Params: config.Params{}},
 				Template: config.TemplateConfig{

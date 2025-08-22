@@ -27,7 +27,7 @@ import (
 func TemplateSite(runtime utils.RuntimeConfig) error {
 	utils.SetupBuild(runtime)
 
-	c, err := config.ReadConfig("configs/config.yml")
+	c, err := config.ReadConfig(runtime)
 	if err != nil {
 		return err
 	}

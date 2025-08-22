@@ -34,9 +34,9 @@ type StylesParams struct {
 }
 
 // ReadConfig reads in the project config yaml located at path
-func ReadConfig(path string) (Config, error) {
+func ReadConfig(runtime utils.RuntimeConfig) (Config, error) {
 	config := Config{}
-	b, err := utils.ReadFile(path)
+	b, err := utils.ReadFile(filepath.Join(runtime.ConfigsPath, "config.yaml"))
 	if err != nil {
 		return config, err
 	}
