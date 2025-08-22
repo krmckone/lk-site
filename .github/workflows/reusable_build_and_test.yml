@@ -21,7 +21,7 @@ jobs:
 
     - name: Get dependencies
       run: |
-        go get -v -t -d ./...
+        go get -v -t ./...
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
@@ -43,6 +43,7 @@ jobs:
       with:
         directory: ./build
         check_favicon: false
+        disable_external: true
         ignore_url: |
           https://linkedin.com/in/krmckone
           https://linkedin.com/in/fy2721
