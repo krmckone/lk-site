@@ -33,8 +33,8 @@ type SteamOwnedGamesResponse struct {
 }
 
 func GetSteamOwnedGames(steamId string) ([]SteamOwnedGame, error) {
-	steam_api_key, present := os.LookupEnv("STEAM_API_KEY")
-	if !present || steam_api_key == "" {
+	steamApiKey, present := os.LookupEnv("STEAM_API_KEY")
+	if !present || steamApiKey == "" {
 		return []SteamOwnedGame{}, fmt.Errorf("STEAM_API_KEY variable not present in env")
 	}
 	baseUrl, err := url.Parse("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/")
@@ -42,8 +42,7 @@ func GetSteamOwnedGames(steamId string) ([]SteamOwnedGame, error) {
 		return []SteamOwnedGame{}, err
 	}
 	params := url.Values{}
-	params.Add("key", steam_api_key)
-	// params.Add("steamid", "76561197988460908")
+	params.Add("key", steamApiKey)
 	params.Add("steamid", steamId)
 	params.Add("include_appinfo", "true")
 	params.Add("include_extended_appinfo", "true")
