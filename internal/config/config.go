@@ -10,7 +10,7 @@ import (
 
 // Config top level project config settings
 type Config struct {
-	Env      Params         `yaml:"environment"`
+	Env      EnvConfig      `yaml:"environment"`
 	Template TemplateConfig `yaml:"template"`
 }
 
@@ -19,6 +19,10 @@ type TemplateConfig struct {
 	Params Params       `yaml:"params"`
 	Icons  Params       `yaml:"icons"`
 	Styles StylesParams `yaml:"styles"`
+}
+
+type EnvConfig struct {
+	Params Params `yaml:"params"`
 }
 
 // Params template variable parameters config

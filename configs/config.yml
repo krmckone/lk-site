@@ -1,5 +1,6 @@
 environment:
-  steamId: "76561197988460908"
+  params:
+    steamId: "76561197988460908"
 template:
   params:
     title: "Kaleb McKone"

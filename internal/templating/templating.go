@@ -100,7 +100,7 @@ func setupPageParams(componentFiles []string, config config.Config, mainContent 
 	for k, v := range config.Template.Params {
 		pageParams[k] = template.HTML(v.(string))
 	}
-	for k, v := range config.Env {
+	for k, v := range config.Env.Params {
 		pageParams[k] = v.(string)
 	}
 	mainContentTemplate, err := template.Must(

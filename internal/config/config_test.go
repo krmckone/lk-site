@@ -26,6 +26,9 @@ func TestReadConfig(t *testing.T) {
 	}{
 		{
 			`
+environment:
+  params:
+    steamId: "invalid_steam_id"
 template:
   params:
     projectName: "Hello, World!"
@@ -36,6 +39,9 @@ template:
     github: github.svg
     linkedin: linkedin.svg`,
 			Config{
+				EnvConfig{Params: Params{
+					"steamId": "invalid_steam_id",
+				}},
 				TemplateConfig{
 					Params{
 						"projectName":        "Hello, World!",
@@ -61,6 +67,7 @@ template:
     name: "NoName"
     yourName: "Name0"`,
 			Config{
+				EnvConfig{},
 				TemplateConfig{
 					Params{
 						"name":               "NoName",
@@ -109,6 +116,7 @@ func TestReadIcons(t *testing.T) {
 	}{
 		{
 			Config{
+				EnvConfig{Params{}},
 				TemplateConfig{
 					Params{},
 					Params{
@@ -119,6 +127,7 @@ func TestReadIcons(t *testing.T) {
 				},
 			},
 			Config{
+				EnvConfig{Params{}},
 				TemplateConfig{
 					Params{
 						"githubIcon":   githubIcon,

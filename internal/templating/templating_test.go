@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/krmckone/lk-site/internal/config"
 	"github.com/krmckone/lk-site/internal/utils"
 )
 
@@ -113,19 +114,26 @@ func TestSetupPageParams(t *testing.T) {
 	})
 	cases := []struct {
 		componentFiles []string
-		params         map[string]interface{}
+		config         config.Config
 		mainContent    string
 		expect         map[string]interface{}
 	}{
 		{
 			[]string{filepath.Join(utils.MakePath("assets"), "components", "steam_deck_top_50.html")},
-			map[string]interface{}{"title": "Test Page"},
+			config.Config{
+				Env: config.EnvConfig{Params: config.Params{}},
+				Template: config.TemplateConfig{
+					Params: config.Params{
+						"title": "Test Page",
+					},
+				},
+			},
 			"<h1>Test Page</h1>",
 			map[string]interface{}{"title": "Test Page", "main_content": template.HTML("<h1>Test Page</h1>")},
 		},
 	}
 	for _, c := range cases {
-		actual, err := setupPageParams(c.componentFiles, c.params, c.mainContent)
+		actual, err := setupPageParams(c.componentFiles, c.config, c.mainContent)
 		if err != nil {
 			t.Errorf("Unexpected error: %s", err)
 		}
