@@ -66,7 +66,7 @@ func TemplateSite() error {
 		// Setup the page params for template execution
 		pageParams, err := setupPageParams(
 			componentFiles,
-			c.Template.Params,
+			c,
 			mdBuffer.String(),
 		)
 		if err != nil {
@@ -95,10 +95,13 @@ func TemplateSite() error {
 	return nil
 }
 
-func setupPageParams(componentFiles []string, params map[string]interface{}, mainContent string) (map[string]interface{}, error) {
+func setupPageParams(componentFiles []string, config config.Config, mainContent string) (map[string]interface{}, error) {
 	pageParams := map[string]interface{}{}
-	for k, v := range params {
+	for k, v := range config.Template.Params {
 		pageParams[k] = template.HTML(v.(string))
+	}
+	for k, v := range config.Env {
+		pageParams[k] = v.(string)
 	}
 	mainContentTemplate, err := template.Must(
 		template.New("main_content").Funcs(getTemplateFuncs()).Parse(mainContent),
@@ -113,7 +116,7 @@ func setupPageParams(componentFiles []string, params map[string]interface{}, mai
 		return nil, err
 	}
 	pageParams["main_content"] = template.HTML(mainContentBuffer.String())
-	pageParams["title"] = params["title"].(string)
+	pageParams["title"] = config.Template.Params["title"].(string)
 	return pageParams, nil
 }
 

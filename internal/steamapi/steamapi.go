@@ -84,7 +84,7 @@ func GetSteamDeckTop50Games(steamId string) ([]SteamOwnedGame, error) {
 func GetSteamDeckTop50Wrapper(steamId string) []SteamOwnedGame {
 	games, err := GetSteamDeckTop50Games(steamId)
 	if err != nil {
-		return []SteamOwnedGame{}
+		panic(err)
 	}
 	return games
 }
