@@ -14,7 +14,7 @@ import (
 func main() {
 	assetsPath := flag.String("assets-path", "assets", "Path to the assets directory")
 	configsPath := flag.String("configs-path", "configs", "Path to the configs directory")
-	buildPath := flag.String("build-path", "configs", "Path to the build directory")
+	buildPath := flag.String("build-path", "build", "Path to the build directory")
 	flag.Parse()
 	runtime := utils.RuntimeConfig{
 		AssetsPath:  *assetsPath,
