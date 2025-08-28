@@ -16,13 +16,13 @@ func main() {
 	configsPath := flag.String("configs-path", "configs", "Path to the configs directory")
 	buildPath := flag.String("build-path", "build", "Path to the build directory")
 	flag.Parse()
-	runtime := utils.RuntimeConfig{
-		AssetsPath:  *assetsPath,
-		ConfigsPath: *configsPath,
-		BuildPath:   *buildPath,
-	}
+	runtime := utils.NewRuntimeConfig()
+	runtime.AssetsPath = *assetsPath
+	runtime.ConfigsPath = *configsPath
+	runtime.BuildPath = *buildPath
+
 	if err := templating.TemplateSite(runtime); err != nil {
-		panic(err)
+		log.Fatalf("Error templating site: %s", err)
 	}
 
 	args := os.Args[1:]

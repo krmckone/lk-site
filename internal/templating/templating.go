@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -47,6 +48,7 @@ func TemplateSite(runtime utils.RuntimeConfig) error {
 	tmpl := template.New("base_page.html")
 	tmpl, err = tmpl.Funcs(runtime.TemplateFuncs).ParseFiles(assetTemplatePaths...)
 	if err != nil {
+		log.Printf("Error parsing files: %s, %s", assetTemplatePaths, err)
 		return err
 	}
 
@@ -79,6 +81,7 @@ func TemplateSite(runtime utils.RuntimeConfig) error {
 		defer file.Close()
 
 		if err := tmpl.ExecuteTemplate(file, "base_page.html", pageParams); err != nil {
+			log.Printf("Error executing template: %s, %s", pageParams, err)
 			return err
 		}
 	}
@@ -104,6 +107,7 @@ func setupPageParams(runtime utils.RuntimeConfig, componentFiles []string, confi
 	}
 	mainContentBuffer := bytes.Buffer{}
 	if err := mainContentTemplate.ExecuteTemplate(&mainContentBuffer, "main_content", pageParams); err != nil {
+		log.Printf("Error executing template: %s, %s", pageParams, err)
 		return nil, err
 	}
 	pageParams["main_content"] = template.HTML(mainContentBuffer.String())
