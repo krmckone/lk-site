@@ -1,6 +1,6 @@
 module github.com/krmckone/lk-site
 
-go 1.22
+go 1.25
 
 require (
 	github.com/mdigger/goldmark-attributes v0.0.0-20210529130523-52da21a6bf2b // direct

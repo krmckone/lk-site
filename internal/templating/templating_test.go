@@ -37,87 +37,6 @@ func TestTemplateSite(t *testing.T) {
 	}
 }
 
-func TestMakeNavTitleFromHref(t *testing.T) {
-	runtime := NewTestRuntime()
-	t.Cleanup(func() {
-		if err := utils.Clean(utils.MakePath(runtime.BuildPath)); err != nil {
-			t.Errorf("Unexpected error from Clean: %s", err)
-		}
-	})
-	cases := []struct {
-		in, expect string
-	}{
-		{
-			"posts/page_0", "Page 0",
-		}, {
-			"posts/page 1", "Page 1",
-		}, {
-			"index_page_zero", "Index Page Zero",
-		},
-	}
-	for _, c := range cases {
-		actual := makeNavTitleFromHref(c.in)
-		if actual != c.expect {
-			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
-		}
-	}
-}
-
-func TestMakeHref(t *testing.T) {
-	runtime := NewTestRuntime()
-	t.Cleanup(func() {
-		if err := utils.Clean(utils.MakePath(runtime.BuildPath)); err != nil {
-			t.Errorf("Unexpected error from Clean: %s", err)
-		}
-	})
-	cases := []struct {
-		assetName, originalPath, expect string
-	}{
-		{
-			"testing_1_2_3", "test/posts", "/posts/testing_1_2_3",
-		},
-		{
-			"file_name", "test123/xyz", "/xyz/file_name",
-		},
-		{
-			"index", "website/test123/files", "/files/index",
-		},
-	}
-	for _, c := range cases {
-		actual := makeHref(c.assetName, c.originalPath)
-		if actual != c.expect {
-			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
-		}
-	}
-}
-
-func TestMakeHrefs(t *testing.T) {
-	runtime := NewTestRuntime()
-	t.Cleanup(func() {
-		if err := utils.Clean(utils.MakePath(runtime.BuildPath)); err != nil {
-			t.Errorf("Unexpected error from Clean: %s", err)
-		}
-	})
-	cases := []struct {
-		path   string
-		expect []string
-	}{
-		{
-			filepath.Join(utils.MakePath(runtime.AssetsPath), "test", "pages"),
-			[]string{"/pages/post_0", "/pages/post_1", "/pages/post_2"},
-		},
-	}
-	for _, c := range cases {
-		actual, err := makeHrefs(c.path)
-		if err != nil {
-			t.Errorf("Unexpected error: %s", err)
-		}
-		if !reflect.DeepEqual(actual, c.expect) {
-			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
-		}
-	}
-}
-
 func TestSetupPageParams(t *testing.T) {
 	runtime := NewTestRuntime()
 	t.Cleanup(func() {
@@ -132,7 +51,7 @@ func TestSetupPageParams(t *testing.T) {
 		expect         map[string]interface{}
 	}{
 		{
-			[]string{filepath.Join(utils.MakePath(runtime.AssetsPath), "components", "steam_deck_top_50.html")},
+			[]string{filepath.Join(utils.MakePath(runtime.AssetsPath), "components", "test_component.html")},
 			config.Config{
 				Env: config.EnvConfig{Params: config.Params{}},
 				Template: config.TemplateConfig{
@@ -146,7 +65,7 @@ func TestSetupPageParams(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		actual, err := setupPageParams(c.componentFiles, c.config, c.mainContent)
+		actual, err := setupPageParams(runtime, c.componentFiles, c.config, c.mainContent)
 		if err != nil {
 			t.Errorf("Unexpected error: %s", err)
 		}
