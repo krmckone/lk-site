@@ -211,7 +211,7 @@ func CopyFiles(srcPath, dstPath string) error {
 	if !strings.HasPrefix(dstPath, GetRepoRoot()) {
 		repoDstPath = MakePath(dstPath)
 	}
-	return os.CopyFS(repoSrcPath, os.DirFS(repoDstPath))
+	return os.CopyFS(repoDstPath, os.DirFS(repoSrcPath))
 }
 
 func makeHrefs(path string) ([]string, error) {
@@ -231,11 +231,8 @@ func makeHrefs(path string) ([]string, error) {
 }
 
 func makeHref(assetName, originalPath string) string {
-	// TODO consider path.Split
-	pathSplit := strings.Split(originalPath, "/")
-	hrefRoot := pathSplit[len(pathSplit)-1]
-
-	return path.Join(hrefRoot, assetName)
+	_, file := path.Split(originalPath)
+	return path.Join(string(os.PathSeparator), file, assetName)
 }
 
 func getAssets(path string) ([]string, error) {
@@ -264,9 +261,9 @@ func getAssets(path string) ([]string, error) {
 }
 
 func makeNavTitleFromHref(assetHref string) string {
-	pathSplit := strings.Split(assetHref, "/")
+	_, file := path.Split(assetHref)
 	caser := cases.Title(language.AmericanEnglish)
 	return caser.String(
-		strings.Join(strings.Split(pathSplit[len(pathSplit)-1], "_"), " "),
+		strings.Join(strings.Split(file, "_"), " "),
 	)
 }

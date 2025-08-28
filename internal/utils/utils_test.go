@@ -238,8 +238,8 @@ func TestCopyFiles(t *testing.T) {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
-	srcPath := filepath.Join(runtime.AssetsPath, "pages")
-	dstPath := filepath.Join(runtime.BuildPath, "pages")
+	srcPath := filepath.Join(runtime.AssetsPath, "images")
+	dstPath := filepath.Join(runtime.BuildPath, "images")
 
 	if err := Clean(dstPath); err != nil {
 		t.Errorf("Unexpected error from Clean: %s", err)
@@ -252,7 +252,7 @@ func TestCopyFiles(t *testing.T) {
 	if err != nil {
 		t.Errorf("unable to read dir %s: %s", MakePath(dstPath), err)
 	}
-	if len(dir) != 1 {
+	if len(dir) != 2 {
 		t.Errorf("unexpected entry in dir %s: %s", MakePath(dstPath), dir)
 	}
 
@@ -261,7 +261,7 @@ func TestCopyFiles(t *testing.T) {
 	if err != nil {
 		t.Errorf("unable to read dir %s: %s", nestedPath, err)
 	}
-	expected := []string{"post_0.md", "post_1.md", "post_2.md"}
+	expected := []string{"dontmindme.jpg", "just_text_actually.jpg"}
 	actual := []string{}
 	for _, file := range nestedDir {
 		actual = append(actual, file.Name())
@@ -347,7 +347,7 @@ func TestMakeHrefs(t *testing.T) {
 		expect []string
 	}{
 		{
-			filepath.Join(MakePath(runtime.AssetsPath), "test", "pages"),
+			filepath.Join(MakePath(runtime.AssetsPath), "pages"),
 			[]string{"/pages/post_0", "/pages/post_1", "/pages/post_2"},
 		},
 	}
