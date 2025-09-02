@@ -133,10 +133,10 @@ func SetupBuild(runtime RuntimeConfig) error {
 	assetDirs := []string{"images", "js", "shaders"}
 	dirs := []string{}
 	for _, dir := range assetDirs {
-		dirs = append(dirs, filepath.Join(runtime.BuildPath, dir))
+		dirs = append(dirs, filepath.Join(MakePath(runtime.BuildPath), dir))
 	}
-	if err := Clean(runtime.BuildPath); err != nil {
-		return fmt.Errorf("error cleaning directory %s: %s", runtime.BuildPath, err)
+	if err := Clean(MakePath(runtime.BuildPath)); err != nil {
+		return fmt.Errorf("error cleaning directory %s: %s", MakePath(runtime.BuildPath), err)
 	}
 	for _, dir := range dirs { // Maybe we could combine these loops
 		if err := Mkdir(dir); err != nil {
@@ -145,7 +145,7 @@ func SetupBuild(runtime RuntimeConfig) error {
 	}
 	for _, dir := range assetDirs {
 		if err := CopyAssetToBuild(runtime, dir); err != nil {
-			return fmt.Errorf("error copying asset to build: %s", err)
+			return fmt.Errorf("error copying %s to %s: %s", dir, runtime.BuildPath, err)
 		}
 	}
 	return nil
