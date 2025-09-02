@@ -13,6 +13,14 @@ import (
 	"github.com/gofrs/flock"
 )
 
+func NewTestRuntime() RuntimeConfig {
+	return RuntimeConfig{
+		AssetsPath:  "test/assets",
+		BuildPath:   "test/build",
+		ConfigsPath: "test/configs",
+	}
+}
+
 func TestReadDir(t *testing.T) {
 	actual, err := ReadDir(filepath.Join("assets", "components"))
 	if err != nil {
@@ -27,12 +35,13 @@ func TestReadDir(t *testing.T) {
 }
 
 func TestGetBasePageFiles(t *testing.T) {
-	actual := GetBasePageFiles()
+	runtime := NewTestRuntime()
+	actual := GetBasePageFiles(runtime)
 	expected := []string{
-		filepath.Join(MakePath("assets"), "base_page.html"),
-		filepath.Join(MakePath("assets"), "header.html"),
-		filepath.Join(MakePath("assets"), "footer.html"),
-		filepath.Join(MakePath("assets"), "topnav.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "base_page.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "header.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "footer.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "topnav.html"),
 	}
 	for i, file := range actual {
 		if file != expected[i] {
@@ -42,12 +51,13 @@ func TestGetBasePageFiles(t *testing.T) {
 }
 
 func TestGetComponentFiles(t *testing.T) {
-	actual, err := GetComponentFiles()
+	runtime := NewTestRuntime()
+	actual, err := GetComponentFiles(runtime)
 	if err != nil {
 		t.Errorf("Unexpected error from GetComponentFiles: %s", err)
 	}
 	expected := []string{
-		filepath.Join(MakePath("assets"), "components", "steam_deck_top_50.html"),
+		filepath.Join(MakePath(runtime.AssetsPath), "components", "test_component.html"),
 	}
 	for i, file := range actual {
 		if file != expected[i] {
@@ -57,8 +67,9 @@ func TestGetComponentFiles(t *testing.T) {
 }
 
 func TestGetRepoRoot(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := Clean(MakePath("build")); err != nil {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
@@ -77,7 +88,6 @@ func makeExpectedPath(input string) (string, error) {
 }
 
 func TestMakePath(t *testing.T) {
-
 	cases := []struct {
 		input    string
 		expected string
@@ -101,7 +111,8 @@ func TestMakePath(t *testing.T) {
 }
 
 func TestSetupBuild(t *testing.T) {
-	lock := flock.New(MakePath("build"))
+	runtime := NewTestRuntime()
+	lock := flock.New(MakePath(runtime.BuildPath))
 	defer lock.Unlock()
 
 	locked, err := lock.TryLock()
@@ -113,15 +124,15 @@ func TestSetupBuild(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		if err := Clean(MakePath("build")); err != nil {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
 
-	if err := SetupBuild(); err != nil {
+	if err := SetupBuild(runtime); err != nil {
 		t.Errorf("Unexpected error from SetupBuild: %s", err)
 	}
-	dir, err := os.ReadDir(MakePath("build"))
+	dir, err := os.ReadDir(MakePath(runtime.BuildPath))
 	if err != nil {
 		t.Errorf("Unexpected error from os.ReadDir: %s", err)
 	}
@@ -136,8 +147,9 @@ func TestSetupBuild(t *testing.T) {
 }
 
 func TestWriteFile(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := Clean(MakePath("build")); err != nil {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
@@ -220,22 +232,17 @@ func TestGetCurrentYear(t *testing.T) {
 }
 
 func TestCopyFiles(t *testing.T) {
+	runtime := NewTestRuntime()
 	t.Cleanup(func() {
-		if err := Clean(MakePath("build")); err != nil {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
 			t.Errorf("Cleanup Unexpected error from Clean: %s", err)
 		}
 	})
-	srcPath := "assets/test"
-	dstPath := "build/test_path"
+	srcPath := filepath.Join(runtime.AssetsPath, "images")
+	dstPath := filepath.Join(runtime.BuildPath, "images")
 
 	if err := Clean(dstPath); err != nil {
 		t.Errorf("Unexpected error from Clean: %s", err)
-	}
-	if err := Mkdir(dstPath); err != nil {
-		t.Errorf("Unexpected error from Mkdir: %s", err)
-	}
-	if _, err := os.Stat(MakePath(dstPath)); os.IsNotExist(err) {
-		t.Errorf("Expected %s to exist and it does not", MakePath(dstPath))
 	}
 	if err := CopyFiles(srcPath, dstPath); err != nil {
 		t.Errorf("Unexpected error from CopyFiles: %s", err)
@@ -245,7 +252,7 @@ func TestCopyFiles(t *testing.T) {
 	if err != nil {
 		t.Errorf("unable to read dir %s: %s", MakePath(dstPath), err)
 	}
-	if len(dir) != 1 {
+	if len(dir) != 2 {
 		t.Errorf("unexpected entry in dir %s: %s", MakePath(dstPath), dir)
 	}
 
@@ -254,7 +261,7 @@ func TestCopyFiles(t *testing.T) {
 	if err != nil {
 		t.Errorf("unable to read dir %s: %s", nestedPath, err)
 	}
-	expected := []string{"post_0.md", "post_1.md", "post_2.md"}
+	expected := []string{"dontmindme.jpg", "just_text_actually.jpg"}
 	actual := []string{}
 	for _, file := range nestedDir {
 		actual = append(actual, file.Name())
@@ -271,5 +278,86 @@ func TestCopyFiles(t *testing.T) {
 
 	if err := Clean(MakePath(dstPath)); err != nil {
 		t.Errorf("Unexpected error from Clean: %s", err)
+	}
+}
+
+func TestMakeNavTitleFromHref(t *testing.T) {
+	runtime := NewTestRuntime()
+	t.Cleanup(func() {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
+	cases := []struct {
+		in, expect string
+	}{
+		{
+			"posts/page_0", "Page 0",
+		}, {
+			"posts/page 1", "Page 1",
+		}, {
+			"index_page_zero", "Index Page Zero",
+		},
+	}
+	for _, c := range cases {
+		actual := makeNavTitleFromHref(c.in)
+		if actual != c.expect {
+			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
+		}
+	}
+}
+
+func TestMakeHref(t *testing.T) {
+	runtime := NewTestRuntime()
+	t.Cleanup(func() {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
+	cases := []struct {
+		assetName, originalPath, expect string
+	}{
+		{
+			"testing_1_2_3", "test/posts", "/posts/testing_1_2_3",
+		},
+		{
+			"file_name", "test123/xyz", "/xyz/file_name",
+		},
+		{
+			"index", "website/test123/files", "/files/index",
+		},
+	}
+	for _, c := range cases {
+		actual := makeHref(c.assetName, c.originalPath)
+		if actual != c.expect {
+			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
+		}
+	}
+}
+
+func TestMakeHrefs(t *testing.T) {
+	runtime := NewTestRuntime()
+	t.Cleanup(func() {
+		if err := Clean(MakePath(runtime.BuildPath)); err != nil {
+			t.Errorf("Unexpected error from Clean: %s", err)
+		}
+	})
+	cases := []struct {
+		path   string
+		expect []string
+	}{
+		{
+			filepath.Join(MakePath(runtime.AssetsPath), "pages"),
+			[]string{"/pages/post_0", "/pages/post_1", "/pages/post_2"},
+		},
+	}
+	for _, c := range cases {
+		actual, err := makeHrefs(c.path)
+		if err != nil {
+			t.Errorf("Unexpected error: %s", err)
+		}
+		if !reflect.DeepEqual(actual, c.expect) {
+			t.Errorf("Expected: %s, actual: %s", c.expect, actual)
+		}
 	}
 }

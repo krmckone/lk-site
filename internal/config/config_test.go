@@ -2,16 +2,24 @@ package config
 
 import (
 	"fmt"
+	"path/filepath"
 	"reflect"
 	"testing"
 
 	"github.com/krmckone/lk-site/internal/utils"
 )
 
+func NewTestRuntime() utils.RuntimeConfig {
+	return utils.RuntimeConfig{
+		AssetsPath:  "test/assets",
+		BuildPath:   "test/build",
+		ConfigsPath: "test/configs",
+	}
+}
+
 func TestReadConfig(t *testing.T) {
-	// do setup config files
-	// read them
-	// test contents
+	runtime := NewTestRuntime()
+	runtime.ConfigsPath = "test/configs/one_off_test"
 	githubIcon, err := readIcon("github.svg")
 	if err != nil {
 		t.Errorf("Error loading test github icon: %s", err)
@@ -26,6 +34,9 @@ func TestReadConfig(t *testing.T) {
 	}{
 		{
 			`
+environment:
+  params:
+    steamId: "invalid_steam_id"
 template:
   params:
     projectName: "Hello, World!"
@@ -36,6 +47,9 @@ template:
     github: github.svg
     linkedin: linkedin.svg`,
 			Config{
+				EnvConfig{Params: Params{
+					"steamId": "invalid_steam_id",
+				}},
 				TemplateConfig{
 					Params{
 						"projectName":        "Hello, World!",
@@ -61,6 +75,7 @@ template:
     name: "NoName"
     yourName: "Name0"`,
 			Config{
+				EnvConfig{},
 				TemplateConfig{
 					Params{
 						"name":               "NoName",
@@ -78,9 +93,9 @@ template:
 	for _, c := range cases {
 		tName := fmt.Sprintf("%v,%v", c.template, c.expect)
 		t.Run(tName, func(t *testing.T) {
-			utils.Mkdir("test_config")
-			utils.WriteFile("test_config/config.yml", []byte(c.template))
-			actual, err := ReadConfig("test_config/config.yml")
+			utils.Mkdir(runtime.ConfigsPath)
+			utils.WriteFile(filepath.Join(runtime.ConfigsPath, "config.yaml"), []byte(c.template))
+			actual, err := ReadConfig(runtime)
 			if err != nil {
 				t.Errorf("Error in reading config: %s", err)
 			}
@@ -88,7 +103,7 @@ template:
 				t.Errorf("Expected: %v, actual: %v", c.expect, actual)
 			}
 			t.Cleanup(func() {
-				utils.Clean("test_config")
+				utils.Clean(filepath.Join(runtime.ConfigsPath))
 			})
 		})
 	}
@@ -109,6 +124,7 @@ func TestReadIcons(t *testing.T) {
 	}{
 		{
 			Config{
+				EnvConfig{Params{}},
 				TemplateConfig{
 					Params{},
 					Params{
@@ -119,6 +135,7 @@ func TestReadIcons(t *testing.T) {
 				},
 			},
 			Config{
+				EnvConfig{Params{}},
 				TemplateConfig{
 					Params{
 						"githubIcon":   githubIcon,

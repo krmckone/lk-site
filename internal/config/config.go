@@ -10,6 +10,7 @@ import (
 
 // Config top level project config settings
 type Config struct {
+	Env      EnvConfig      `yaml:"environment"`
 	Template TemplateConfig `yaml:"template"`
 }
 
@@ -18,6 +19,10 @@ type TemplateConfig struct {
 	Params Params       `yaml:"params"`
 	Icons  Params       `yaml:"icons"`
 	Styles StylesParams `yaml:"styles"`
+}
+
+type EnvConfig struct {
+	Params Params `yaml:"params"`
 }
 
 // Params template variable parameters config
@@ -29,9 +34,9 @@ type StylesParams struct {
 }
 
 // ReadConfig reads in the project config yaml located at path
-func ReadConfig(path string) (Config, error) {
+func ReadConfig(runtime utils.RuntimeConfig) (Config, error) {
 	config := Config{}
-	b, err := utils.ReadFile(path)
+	b, err := utils.ReadFile(filepath.Join(runtime.ConfigsPath, "config.yaml"))
 	if err != nil {
 		return config, err
 	}

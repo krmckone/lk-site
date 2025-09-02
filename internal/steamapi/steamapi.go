@@ -2,14 +2,14 @@ package steamapi
 
 import (
 	"cmp"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"slices"
 	"strconv"
 	"time"
-
-	"github.com/krmckone/lk-site/internal/utils"
 )
 
 type SteamOwnedGame struct {
@@ -32,9 +32,9 @@ type SteamOwnedGamesResponse struct {
 	}
 }
 
-func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
-	steam_api_key, present := os.LookupEnv("STEAM_API_KEY")
-	if !present || steam_api_key == "" {
+func GetSteamOwnedGames(steamId string) ([]SteamOwnedGame, error) {
+	steamApiKey, present := os.LookupEnv("STEAM_API_KEY")
+	if !present || steamApiKey == "" {
 		return []SteamOwnedGame{}, fmt.Errorf("STEAM_API_KEY variable not present in env")
 	}
 	baseUrl, err := url.Parse("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/")
@@ -42,32 +42,32 @@ func GetSteamOwnedGames() ([]SteamOwnedGame, error) {
 		return []SteamOwnedGame{}, err
 	}
 	params := url.Values{}
-	params.Add("key", steam_api_key)
-	params.Add("steamid", "76561197988460908") // me
+	params.Add("key", steamApiKey)
+	params.Add("steamid", steamId)
 	params.Add("include_appinfo", "true")
 	params.Add("include_extended_appinfo", "true")
 	params.Add("include_played_free_games", "true")
 	params.Add("include_free_sub", "true")
 	params.Add("skip_unvetted_apps", "true")
 	baseUrl.RawQuery = params.Encode()
-	resp, err := utils.HttpGet(baseUrl.String())
+	resp, err := httpGet(baseUrl.String())
 	if err != nil {
 		return []SteamOwnedGame{}, err
 	}
 	target := SteamOwnedGamesResponse{}
-	utils.ReadHttpRespBody(resp, &target)
+	readHttpRespBody(resp, &target)
 	return target.Response.Games, nil
 }
 
-func GetSteamDeckTop50Games() ([]SteamOwnedGame, error) {
-	games, err := GetSteamOwnedGames()
+func GetSteamDeckTop50Games(steamId string) ([]SteamOwnedGame, error) {
+	games, err := GetSteamOwnedGames(steamId)
 	if err != nil {
 		return []SteamOwnedGame{}, err
 	}
 	if err := ProcessOwnedGames(games); err != nil {
 		return []SteamOwnedGame{}, err
 	}
-	steamDeckGames := utils.Filter(games, func(g SteamOwnedGame) bool {
+	steamDeckGames := filter(games, func(g SteamOwnedGame) bool {
 		if g.PlaytimeDeckForever > 0.0 {
 			return true
 		} else {
@@ -80,10 +80,10 @@ func GetSteamDeckTop50Games() ([]SteamOwnedGame, error) {
 	return steamDeckGames[:50], nil
 }
 
-func GetSteamDeckTop50Wrapper() []SteamOwnedGame {
-	games, err := GetSteamDeckTop50Games()
+func GetSteamDeckTop50Wrapper(steamId string) []SteamOwnedGame {
+	games, err := GetSteamDeckTop50Games(steamId)
 	if err != nil {
-		return []SteamOwnedGame{}
+		panic(err)
 	}
 	return games
 }
@@ -111,4 +111,36 @@ func truncateFloat(f float64) (float64, error) {
 		return t, err
 	}
 	return t, nil
+}
+
+func httpGet(url string) (*http.Response, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected HTTP GET return code: %d", resp.StatusCode)
+	}
+	return resp, nil
+}
+
+func readHttpRespBody(resp *http.Response, target interface{}) error {
+	defer resp.Body.Close()
+	err := json.NewDecoder(resp.Body).Decode(target)
+	if err != nil {
+		return fmt.Errorf("error in reading HTTP response body: %s", err)
+	}
+	return nil
+}
+
+func filter[S ~[]E, E any](s S, f func(E) bool) []E {
+	result := []E{}
+
+	for i := range s {
+		if f(s[i]) {
+			result = append(result, s[i])
+		}
+	}
+
+	return result
 }

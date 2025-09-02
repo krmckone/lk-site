@@ -2,18 +2,48 @@ package utils
 
 // TODO: Update these to return errors rather than log
 import (
-	"encoding/json"
 	"fmt"
-	"io"
+	"html/template"
 	"log"
-	"net/http"
 	"os"
+	"path"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/krmckone/lk-site/internal/steamapi"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
+
+// Parameterizes specific values needed to load assets and configuration
+// at runtime
+type RuntimeConfig struct {
+	AssetsPath    string
+	ConfigsPath   string
+	BuildPath     string
+	TemplateFuncs template.FuncMap
+}
+
+func NewRuntimeConfig() RuntimeConfig {
+	return RuntimeConfig{
+		AssetsPath:    "assets",
+		ConfigsPath:   "configs",
+		BuildPath:     "build",
+		TemplateFuncs: getTemplateFuncs(),
+	}
+}
+
+func getTemplateFuncs() template.FuncMap {
+	return template.FuncMap{
+		"makeHrefs":         makeHrefs,
+		"makeNavTitle":      makeNavTitleFromHref,
+		"getSteamDeckTop50": steamapi.GetSteamDeckTop50Wrapper,
+	}
+}
 
 var (
 	repoRoot     string
@@ -45,7 +75,7 @@ func ReadDir(path string) ([]string, error) {
 // GetBasePageFiles returns the list of base page files in the assets directory
 // This is statically defined and does not support subdirectories since these
 // should not change often
-func GetBasePageFiles() []string {
+func GetBasePageFiles(runtime RuntimeConfig) []string {
 	files := []string{
 		"base_page.html",
 		"header.html",
@@ -53,14 +83,14 @@ func GetBasePageFiles() []string {
 		"topnav.html",
 	}
 	for i, file := range files {
-		files[i] = filepath.Join(MakePath("assets"), file)
+		files[i] = filepath.Join(MakePath(runtime.AssetsPath), file)
 	}
 	return files
 }
 
 // GetComponentFiles returns the list of component files in the assets/components directory
-func GetComponentFiles() ([]string, error) {
-	return ReadDir(filepath.Join(MakePath("assets"), "components"))
+func GetComponentFiles(runtime RuntimeConfig) ([]string, error) {
+	return ReadDir(filepath.Join(MakePath(runtime.AssetsPath), "components"))
 }
 
 // GetRepoRoot returns the root directory of the repository. This value is used
@@ -99,20 +129,23 @@ func MakePath(path string) string {
 // SetupBuild generates the directories for the output artifacts and puts
 // assets that do not need processing in the build directory; these assets
 // are referred to by the output artifacts
-func SetupBuild() error {
-	dirs := []string{"build", "build/images", "build/js", "build/shaders"}
-	for _, dir := range dirs {
-		if err := Clean(dir); err != nil {
-			return fmt.Errorf("error cleaning directory %s: %s", dir, err)
-		}
+func SetupBuild(runtime RuntimeConfig) error {
+	assetDirs := []string{"images", "js", "shaders"}
+	dirs := []string{}
+	for _, dir := range assetDirs {
+		dirs = append(dirs, filepath.Join(MakePath(runtime.BuildPath), dir))
+	}
+	if err := Clean(MakePath(runtime.BuildPath)); err != nil {
+		return fmt.Errorf("error cleaning directory %s: %s", MakePath(runtime.BuildPath), err)
+	}
+	for _, dir := range dirs { // Maybe we could combine these loops
 		if err := Mkdir(dir); err != nil {
 			return fmt.Errorf("error making directory %s: %s", dir, err)
 		}
 	}
-	assetDirs := []string{"images", "js", "shaders"}
 	for _, dir := range assetDirs {
-		if err := CopyAssetToBuild(dir); err != nil {
-			return fmt.Errorf("error copying asset to build: %s", err)
+		if err := CopyAssetToBuild(runtime, dir); err != nil {
+			return fmt.Errorf("error copying %s to %s: %s", dir, runtime.BuildPath, err)
 		}
 	}
 	return nil
@@ -161,10 +194,10 @@ func GetCurrentYear() string {
 	return strconv.Itoa(time.Now().Year())
 }
 
-func CopyAssetToBuild(srcName string) error {
+func CopyAssetToBuild(runtime RuntimeConfig, srcName string) error {
 	return CopyFiles(
-		filepath.Join("assets", srcName),
-		filepath.Join("build", srcName),
+		filepath.Join(runtime.AssetsPath, srcName),
+		filepath.Join(runtime.BuildPath, srcName),
 	)
 }
 
@@ -178,93 +211,59 @@ func CopyFiles(srcPath, dstPath string) error {
 	if !strings.HasPrefix(dstPath, GetRepoRoot()) {
 		repoDstPath = MakePath(dstPath)
 	}
-
-	entries, err := os.ReadDir(repoSrcPath)
-	if err != nil {
-		return fmt.Errorf("error reading directory at %s: %s", repoSrcPath, err)
-	}
-	for _, entry := range entries {
-		if !entry.Type().IsDir() {
-			if err := copyFile(
-				filepath.Join(repoSrcPath, entry.Name()),
-				filepath.Join(repoDstPath, entry.Name()),
-			); err != nil {
-				return fmt.Errorf("error copying file from %s to %s: %s", MakePath(filepath.Join(repoSrcPath, entry.Name())), MakePath(filepath.Join(repoDstPath, entry.Name())), err)
-			}
-		} else {
-			if err := Mkdir(filepath.Join(repoDstPath, entry.Name())); err != nil {
-				return fmt.Errorf("error making directory at %s: %s", MakePath(filepath.Join(repoDstPath, entry.Name())), err)
-			}
-			if err := CopyFiles(
-				filepath.Join(repoSrcPath, entry.Name()),
-				filepath.Join(repoDstPath, entry.Name()),
-			); err != nil {
-				return fmt.Errorf("error copying files from %s to %s: %s", MakePath(filepath.Join(repoSrcPath, entry.Name())), MakePath(filepath.Join(repoDstPath, entry.Name())), err)
-			}
-		}
-	}
-	return nil
+	return os.CopyFS(repoDstPath, os.DirFS(repoSrcPath))
 }
 
-func copyFile(srcPath, dstPath string) error {
-	sourceFileStat, err := os.Stat(MakePath(srcPath))
+func makeHrefs(path string) ([]string, error) {
+	var hrefs []string
+
+	assets, err := getAssets(path)
 	if err != nil {
-		return fmt.Errorf("error getting description for file at %s: %s", MakePath(srcPath), err)
+		return hrefs, err
 	}
 
-	if !sourceFileStat.Mode().IsRegular() {
-		return fmt.Errorf("%s is not a regular file", MakePath(srcPath))
+	sort.Strings(assets)
+	for _, v := range assets {
+		hrefs = append(hrefs, makeHref(v, path))
 	}
 
-	source, err := os.Open(MakePath(srcPath))
-	if err != nil {
-		return fmt.Errorf("error opening file at %s: %s", MakePath(srcPath), err)
-	}
-	defer source.Close()
-
-	os.MkdirAll(filepath.Dir(MakePath(dstPath)), os.ModePerm)
-	destination, err := os.Create(MakePath(dstPath))
-	if err != nil {
-		return fmt.Errorf("error creating file at %s: %s", MakePath(dstPath), err)
-	}
-	defer destination.Close()
-	_, err = io.Copy(destination, source)
-	if err != nil {
-		return fmt.Errorf("error copying file from %s to %s: %s", MakePath(srcPath), MakePath(dstPath), err)
-	}
-	return nil
+	return hrefs, nil
 }
 
-// Invokes HTTP GET on the URL and returns the body as a string
-func HttpGet(url string) (*http.Response, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected HTTP GET return code: %d", resp.StatusCode)
-	}
-	return resp, nil
+func makeHref(assetName, originalPath string) string {
+	_, file := path.Split(originalPath)
+	return path.Join(string(os.PathSeparator), file, assetName)
 }
 
-func ReadHttpRespBody(resp *http.Response, target interface{}) error {
-	defer resp.Body.Close()
-	err := json.NewDecoder(resp.Body).Decode(target)
+func getAssets(path string) ([]string, error) {
+	var assets []string
+
+	dir, err := os.Open(MakePath(path))
 	if err != nil {
-		return fmt.Errorf("error in reading HTTP response body: %s", err)
+		return assets, err
 	}
-	return nil
-}
 
-// Generic filtering
-func Filter[S ~[]E, E any](s S, f func(E) bool) []E {
-	result := []E{}
+	files, err := dir.Readdir(0)
+	if err != nil {
+		return assets, err
+	}
 
-	for i := range s {
-		if f(s[i]) {
-			result = append(result, s[i])
+	for i, v := range files {
+		// We only want to treat files as assets here. If there's nested
+		// directories containg more assets, then getAssets needs to get
+		// called with that nested path to handle that case separately
+		if !v.IsDir() {
+			assets = append(assets, strings.Split(files[i].Name(), ".")[0])
 		}
 	}
 
-	return result
+	return assets, nil
+}
+
+func makeNavTitleFromHref(assetHref string) string {
+	_, file := path.Split(assetHref)
+	caser := cases.Title(language.AmericanEnglish)
+	return caser.String(
+		strings.Join(strings.Split(file, "_"), " "),
+	)
 }

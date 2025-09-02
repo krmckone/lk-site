@@ -1,17 +1,28 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/krmckone/lk-site/internal/templating"
+	"github.com/krmckone/lk-site/internal/utils"
 )
 
 func main() {
-	if err := templating.TemplateSite(); err != nil {
-		panic(err)
+	assetsPath := flag.String("assets-path", "assets", "Path to the assets directory")
+	configsPath := flag.String("configs-path", "configs", "Path to the configs directory")
+	buildPath := flag.String("build-path", "build", "Path to the build directory")
+	flag.Parse()
+	runtime := utils.NewRuntimeConfig()
+	runtime.AssetsPath = *assetsPath
+	runtime.ConfigsPath = *configsPath
+	runtime.BuildPath = *buildPath
+
+	if err := templating.TemplateSite(runtime); err != nil {
+		log.Fatalf("Error templating site: %s", err)
 	}
 
 	args := os.Args[1:]
