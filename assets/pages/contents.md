@@ -1,3 +1,2 @@
-# Site Contents
-
-{{ template "contents" }}
+### Site Contents
+<div>{{ template "contents" }}</div>
