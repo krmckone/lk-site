@@ -1,2 +1,3 @@
 # Site Contents
+
 {{ template "contents" }}
