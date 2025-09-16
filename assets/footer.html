@@ -1,19 +1,34 @@
 {{ define "footer" }}
-<p>
-  {{ .projectName }} by {{ .myName }}, {{ .subtitle }}. {{ .currentYear }}.
-  <br>
-  Last updated {{.currentEasternTime}}
-  <br>
+<div class="row">
+  <div class="box">
+    <p>
+      {{ .projectName }} by {{ .myName }}, {{ .subtitle }}. {{ .currentYear }}.
+    </p>
+  </div>
+</div>
+<div class="row">
+  <div class="box">
+    <p>
+      Last updated {{.currentEasternTime}}
+    </p>
+  </div>
+</div>
+<div class="row">
   <a href="https://github.com/krmckone/lk-site/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">
     License
   </a>
-</p>
-<div>
-  <a href="https://linkedin.com/in/krmckone" target="_blank" rel="noopener noreferrer">
-    {{ .linkedinIcon }}
-  </a>
-  <a href="https://github.com/krmckone/lk-site" target="_blank" rel="noopener noreferrer">
-    {{ .githubIcon }}
-  </a>
+</div>
+<div class="row">
+  <div class="box">
+
+    <a href="https://linkedin.com/in/krmckone" target="_blank" rel="noopener noreferrer">
+      {{ .linkedinIcon }}
+    </a>
+  </div>
+  <div class="box">
+    <a href="https://github.com/krmckone/lk-site" target="_blank" rel="noopener noreferrer">
+      {{ .githubIcon }}
+    </a>
+  </div>
 </div>
 {{ end }}
