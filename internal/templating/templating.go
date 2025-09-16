@@ -3,6 +3,7 @@ package templating
 import (
 	"bytes"
 	"fmt"
+	gohtml "html"
 	"html/template"
 	"log"
 	"os"
@@ -98,7 +99,7 @@ func setupPageParams(runtime utils.RuntimeConfig, componentFiles []string, confi
 		pageParams[k] = v.(string)
 	}
 	mainContentTemplate, err := template.Must(
-		template.New("main_content").Funcs(runtime.TemplateFuncs).Parse(mainContent),
+		template.New("main_content").Funcs(runtime.TemplateFuncs).Parse(gohtml.UnescapeString(mainContent)),
 	).ParseFiles(
 		componentFiles...,
 	)

@@ -1,46 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="verdana">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{.sheetsURL}}">
-  <style type="text/css" media="screen">
-    body {
-      min-height: 100vh;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="{{.sheetsURL}}">
+  <link rel="stylesheet" type="text/css" href="/css/styles.css">
   <title>{{.title}}</title>
 </head>
 
-
 <body>
-  <nav>
-    <ul>
-      <li>
-        <a hef="/index.html">Home</a>
-      </li>
-      <li>
-        <details>
-          <summary>
-            Pages
-          </summary>
-          {{ template "topnav" . }}
-        </details>
-      </li>
-      <li>
-        <a href="/about.html">About</a>
-      </li>
-    </ul>
-  </nav>
-
-  <div>
+  <header>
     {{ template "header" . }}
-  </div>
+  </header>
 
-  <section>
-    {{.main_content}}
-  </section>
+  <hr>
+
+  <main>
+    <article>
+      <section>
+        {{.main_content}}
+      </section>
+    </article>
+  </main>
+
+  <hr>
 
   <footer>
     {{ template "footer" . }}

@@ -80,7 +80,6 @@ func GetBasePageFiles(runtime RuntimeConfig) []string {
 		"base_page.html",
 		"header.html",
 		"footer.html",
-		"topnav.html",
 	}
 	for i, file := range files {
 		files[i] = filepath.Join(MakePath(runtime.AssetsPath), file)
@@ -130,7 +129,7 @@ func MakePath(path string) string {
 // assets that do not need processing in the build directory; these assets
 // are referred to by the output artifacts
 func SetupBuild(runtime RuntimeConfig) error {
-	assetDirs := []string{"images", "js", "shaders"}
+	assetDirs := []string{"css", "images", "js", "shaders"}
 	dirs := []string{}
 	for _, dir := range assetDirs {
 		dirs = append(dirs, filepath.Join(MakePath(runtime.BuildPath), dir))

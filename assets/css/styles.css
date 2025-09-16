@@ -1,3 +1,13 @@
-p {
-  color: blue;
-}
+    .row {
+      padding: 0.4rem;
+      display: flex;           /* make each row a flex container */
+      justify-content: center; /* center items in the row horizontally */
+      gap: 20px;               /* space between items in the row */
+    }
+
+    .box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+    }

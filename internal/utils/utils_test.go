@@ -26,12 +26,15 @@ func TestReadDir(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error from ReadDir: %s", err)
 	}
-	expected := []string{filepath.Join("assets", "components", "steam_deck_top_50.html")}
-	for i, file := range actual {
-		if file != expected[i] {
-			t.Errorf("Expected: %s, actual: %s", expected[i], file)
-		}
+	expected := []string{
+		filepath.Join("assets", "components", "steam_deck_top_50.html"),
+		filepath.Join("assets", "components", "contents.html"),
 	}
+	slices.Sort(expected)
+	if !slices.Equal(actual, expected) {
+		t.Errorf("Expected: %s, actual: %s", expected, actual)
+	}
+
 }
 
 func TestGetBasePageFiles(t *testing.T) {
@@ -41,7 +44,6 @@ func TestGetBasePageFiles(t *testing.T) {
 		filepath.Join(MakePath(runtime.AssetsPath), "base_page.html"),
 		filepath.Join(MakePath(runtime.AssetsPath), "header.html"),
 		filepath.Join(MakePath(runtime.AssetsPath), "footer.html"),
-		filepath.Join(MakePath(runtime.AssetsPath), "topnav.html"),
 	}
 	for i, file := range actual {
 		if file != expected[i] {
@@ -136,11 +138,13 @@ func TestSetupBuild(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error from os.ReadDir: %s", err)
 	}
-	expected := []string{"images", "js", "shaders"}
+	expected := []string{"css", "images", "js", "shaders"}
+	slices.Sort(expected)
 	actual := []string{}
 	for _, d := range dir {
 		actual = append(actual, d.Name())
 	}
+	slices.Sort(actual)
 	if !slices.Equal(expected, actual) {
 		t.Errorf("Expected %s, got: %s", expected, actual)
 	}

@@ -1,0 +1,2 @@
+# Site Contents
+{{ template "contents" }}
