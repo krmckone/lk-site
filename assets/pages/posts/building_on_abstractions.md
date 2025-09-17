@@ -1,2 +1,1 @@
-https://linkedin.com/in/fy2721
-Start off by reading her summary
+## WIP: The importance of abstractions in software, life, mathematics, system building in general
