@@ -1,14 +1,14 @@
 ### About me
 
-My name is Kaleb McKone. I'm a software engineer with a current focus in web development. I currently work at TPM startup Vividy. In the past I've worked at at Thomson Reuters, the University of Iowa, Target HQ, an ed tech startup and a freight tech SaaS startup.
+My name is Kaleb McKone. I'm a software engineer with a current focus in web development. I currently work at TPM startup Vividy. In the past I've worked at at Thomson Reuters, the University of Iowa, Target HQ, an ed tech startup, and a freight tech SaaS startup.
 
-My goal is to pivot into computer graphics with a focus on real time rendering. Part of this site's purpose is to document my learning journey as I try to break into the computer graphics space.
+My current hobby/goal is slowly reaching into computer graphics with a focus on real time rendering. Part of this site's purpose is to document my learning journey as I try to break into the computer graphics space.
 
 I studied computer science and mathematics at the University of Iowa in Iowa City, Iowa. I graduated in 2019. Some of my favorite topics that I studied at undergrad include discrete mathematics, linear and abstract algebra, numerical analysis, algorithms, and programming language design. During my Junior and Senior years I worked in Iowa's math tutoring lab part time.
 
 ### How does this site work?
 
-This site is a project in progress, both in the content and infrastructure. Today, it is a static content site hosted by GitHub pages at [krm-site](https://github.com/krmckone/krm-site). The domain krmckone.com is managed by cloudflare. The source of the site is a combination of markdown and HTML templates. Individual pages are written in markdown and a static site generator consumes those files and inserts the content into HTML templates to form the site itself that you are viewing now. For example, this about page is authored in markdown but is converted to HTML using a template.
+This site is a project in progress, both in the content and infrastructure. Today, it is a static content site hosted by GitHub pages at [krm-site](https://github.com/krmckone/krm-site). The domain krmckone.com is managed by cloudflare. The source of the site is a combination of markdown and HTML templates. Individual pages are written in markdown and a static site generator consumes those files and inserts the content into HTML templates to form the site itself that you are viewing now. For example, this about page is authored in markdown but is converted to HTML using a template. The styling is primarily implemented by [mcss](https://mikemai.net/mcss/) under the Verdana style.
 
 All of the implementation details of how this works are visible in the mentioned repositories.
 
