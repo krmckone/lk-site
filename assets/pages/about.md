@@ -2,7 +2,7 @@
 
 My name is Kaleb McKone. I'm a software engineer with a current focus in web development. I currently work at TPM startup Vividy. In the past I've worked at at Thomson Reuters, the University of Iowa, Target HQ, an ed tech startup, and a freight tech SaaS startup.
 
-My current hobby/goal is slowly reaching into computer graphics with a focus on real time rendering. Part of this site's purpose is to document my learning journey as I try to break into the computer graphics space.
+My current hobby/goal is slowly reaching into computer graphics with a focus on real time rendering. Part of this site's purpose is to document my learning journey as I try to break into the computer graphics space. This is a long term goal of mine, and I would expect it to take several more years of study and practice before I can consider myself proficient in the area.
 
 I studied computer science and mathematics at the University of Iowa in Iowa City, Iowa. I graduated in 2019. Some of my favorite topics that I studied at undergrad include discrete mathematics, linear and abstract algebra, numerical analysis, algorithms, and programming language design. During my Junior and Senior years I worked in Iowa's math tutoring lab part time.
 
