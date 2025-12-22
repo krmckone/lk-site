@@ -42,11 +42,13 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           repository: "krmckone/krm-site"
           path: "krm-site"
-      - name: Make deploy script executable
-        run: chmod +x lk-site/.github/workflows/scripts/deploy.sh
       - name: Deploy
         shell: bash --noprofile --norc -o pipefail {0}
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
         working-directory: "krm-site"
-        run: ../lk-site/.github/workflows/scripts/deploy.sh
+        run: |
+          curl -sL -H "Authorization: token ${{ steps.app-token.outputs.token }}" \
+          https://raw.githubusercontent.com/krmckone/lk-site/main/.github/workflows/scripts/deploy.sh | bash -s
