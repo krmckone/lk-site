@@ -2,8 +2,6 @@
 set -Eeuo pipefail
 IFS=$'\n\t'
 
-cd "${GITHUB_WORKSPACE}/krm-site"
-
 RELEASE_DATE=$(date +%m-%d-%y-%H:%M:%S)
 REFERENCE_LINK="krmckone/lk-site@$(git rev-parse --short "$GITHUB_SHA")"
 
