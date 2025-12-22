@@ -7,6 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: lk-site-deploy
+  cancel-in-progress: false
+
 jobs:
   build-and-test:
     uses: ./.github/workflows/reusable_build_and_test.yml
@@ -28,8 +32,6 @@ jobs:
         with:
           name: site
           path: ~/site
-          github-token: ${{ secrets.GH_PAT }}
-          run-id: ${{ github.run_id }}
       - name: Check out krm-site (deploy target repository)
         uses: actions/checkout@v4
         with:
@@ -39,11 +41,13 @@ jobs:
       - name: Check out lk-site (deploy source repository)
         uses: actions/checkout@v4
         with:
-          token: ${{ steps.app-token.outputs.token }}
-          repository: "krmckone/lk-site"
           path: "lk-site"
       - name: Make deploy script executable
         run: chmod +x lk-site/.github/workflows/scripts/deploy.sh
+      - name: "Check GH Auth"
+        run: gh auth status
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
       - name: Deploy
         shell: bash --noprofile --norc -o pipefail {0}
         env:
