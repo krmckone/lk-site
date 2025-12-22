@@ -27,6 +27,10 @@ jobs:
         with:
           app-id: ${{ secrets.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+      - name: "Check GH Auth"
+        run: gh auth status
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
       - name: Download Static Site Build Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -38,16 +42,8 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           repository: "krmckone/krm-site"
           path: "krm-site"
-      - name: Check out lk-site (deploy source repository)
-        uses: actions/checkout@v4
-        with:
-          path: "lk-site"
       - name: Make deploy script executable
         run: chmod +x lk-site/.github/workflows/scripts/deploy.sh
-      - name: "Check GH Auth"
-        run: gh auth status
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
       - name: Deploy
         shell: bash --noprofile --norc -o pipefail {0}
         env:
