@@ -5,6 +5,8 @@ IFS=$'\n\t'
 RELEASE_DATE=$(date +%m-%d-%y-%H:%M:%S)
 REFERENCE_LINK="krmckone/lk-site@$(git rev-parse --short "$GITHUB_SHA")"
 cd "$GITHUB_WORKSPACE/krm-site"
+git remote -v
+git ls-remote origin HEAD
 
 configure_git() {
   git config --global --type bool push.autoSetupRemote true
@@ -35,6 +37,7 @@ copy_site_files() {
     --exclude='.github/' \
     --exclude='.gitignore' \
     --exclude='CNAME' \
+    --exclude='README.md' \
     --exclude='game_of_life/' \
     "$GITHUB_WORKSPACE/site/" \
     "$GITHUB_WORKSPACE/krm-site/"
