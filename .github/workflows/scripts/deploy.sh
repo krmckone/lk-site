@@ -33,6 +33,9 @@ copy_site_files() {
   rsync -a --delete \
     --exclude='.git/' \
     --exclude='.github/' \
+    --exclude='.gitignore' \
+    --exclude='CNAME' \
+    --exclude='game_of_life/' \
     "$GITHUB_WORKSPACE/site/" \
     "$GITHUB_WORKSPACE/krm-site/"
 }
