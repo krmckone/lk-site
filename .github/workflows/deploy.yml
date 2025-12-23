@@ -35,7 +35,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: site
-          path: ~/site
+          path: ${{ github.workspace }}/site
       - name: Check out krm-site (deploy target repository)
         uses: actions/checkout@v4
         with:
