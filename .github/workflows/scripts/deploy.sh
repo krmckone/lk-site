@@ -64,7 +64,7 @@ EOF
     gh pr create --title "Automatic Release $RELEASE_DATE" --body "$body"
   fi
 
-  gh pr merge --auto --merge
+  gh pr merge --merge
 }
 
 git --version
