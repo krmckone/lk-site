@@ -42,21 +42,18 @@ git add .
 git commit -m "New Release $REFERENCE_LINK $RELEASE_DATE"
 git push origin "$DEPLOY_BRANCH" --set-upstream
 
-PR_NUMBER=$(gh pr list --head "$DEPLOY_BRANCH" --base main --state open --json number --jq '.[0].number')
-if [[ -z "$PR_NUMBER" ]]; then
+if ! gh pr view "$DEPLOY_BRANCH" &>/dev/null; then
     PR_BODY="* This pull request was automatically created by $GITHUB_SERVER_URL/krmckone/lk-site/actions/runs/$GITHUB_RUN_ID
     * Release based on $REFERENCE_LINK"
-    PR_NUMBER=$(gh pr create \
+    gh pr create \
         --title "Automatic Release $RELEASE_DATE" \
         --body "$PR_BODY" \
         --base main \
-        --head "$DEPLOY_BRANCH" \
-        --json number \
-        --jq '.number')
+        --head "$DEPLOY_BRANCH"
 fi
 
+PR_NUMBER=$(gh pr list --head "$DEPLOY_BRANCH" --base main --state open --json number --jq '.[0].number')
+
 if [[ -n "$PR_NUMBER" ]]; then
-  gh pr merge "$PR_NUMBER" --merge --delete-branch || echo "PR already merged or merge failed"
-else
-  echo "Failed to create or find PR for branch $DEPLOY_BRANCH"
+    gh pr merge "$PR_NUMBER" --merge --delete-branch || echo "PR already merged or merge failed"
 fi
