@@ -8,8 +8,8 @@ cd "$GITHUB_WORKSPACE/krm-site"
 
 configure_git() {
   git config --global --type bool push.autoSetupRemote true
-  git config --global user.name "lk-site GitHub Actions Bot"
-  git config --global user.email "20476319+krmckone@users.noreply.github.com"
+  git config user.name "lk-site GitHub Actions Bot"
+  git config user.email "20476319+krmckone@users.noreply.github.com"
   git config user.name
   git config user.email
   basename -s .git `git config --get remote.origin.url`
@@ -25,7 +25,16 @@ create_deployment_branch() {
 }
 
 copy_site_files() {
-  rsync -a --delete "$HOME/site/" "$HOME/krm-site/"
+  if [[ -z "$(ls -A "$GITHUB_WORKSPACE/site")" ]]; then
+    echo "Build output is empty, nothing to deploy"
+    exit 1
+  fi
+
+  rsync -a --delete \
+    --exclude='.git/' \
+    --exclude='.github/' \
+    "$GITHUB_WORKSPACE/site/" \
+    "$GITHUB_WORKSPACE/krm-site/"
 }
 
 commit_changes() {
