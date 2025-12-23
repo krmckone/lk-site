@@ -5,11 +5,12 @@ IFS=$'\n\t'
 RELEASE_DATE=$(date +%m-%d-%y-%H:%M:%S)
 REFERENCE_LINK="krmckone/lk-site@$(git rev-parse --short "$GITHUB_SHA")"
 cd "$GITHUB_WORKSPACE/krm-site"
+git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/krmckone/krm-site.git"
 git remote -v
 git ls-remote origin HEAD
 
 configure_git() {
-  git config --global --type bool push.autoSetupRemote true
+  git config --type bool push.autoSetupRemote true
   git config user.name "lk-site GitHub Actions Bot"
   git config user.email "20476319+krmckone@users.noreply.github.com"
   git config user.name
@@ -62,10 +63,9 @@ create_and_merge_pr() {
 EOF
 )
 
-  gh pr create \
-    --title "Automatic Release $RELEASE_DATE" \
-    --body "$body" \
-    || echo "PR already exists, continuing"
+  if ! gh pr view &>/dev/null; then
+    gh pr create --title "Automatic Release $RELEASE_DATE" --body "$body"
+  fi
 
   local retries=0
   local max_retries=3
