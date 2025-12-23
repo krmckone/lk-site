@@ -43,13 +43,12 @@ jobs:
           repository: "krmckone/krm-site"
           path: krm-site
       - name: Get deploy script
-        working-directory: krm-site
         run: |
           curl -sL \
             -H "Authorization: token ${{ steps.app-token.outputs.token }}" \
             https://raw.githubusercontent.com/krmckone/lk-site/main/.github/workflows/scripts/deploy.sh \
-            -o deploy.sh
-          chmod +x deploy.sh
+            -o $RUNNER_TEMP/deploy.sh
+          chmod +x $RUNNER_TEMP/deploy.sh
 
       - name: Deploy
         working-directory: krm-site
@@ -57,4 +56,4 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
-        run: ./deploy.sh
+        run: $RUNNER_TEMP/deploy.sh

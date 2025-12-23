@@ -4,6 +4,7 @@ IFS=$'\n\t'
 
 RELEASE_DATE=$(date +%m-%d-%y-%H:%M:%S)
 REFERENCE_LINK="krmckone/lk-site@$(git rev-parse --short "$GITHUB_SHA")"
+cd "$GITHUB_WORKSPACE/krm-site"
 
 configure_git() {
   git config --global --type bool push.autoSetupRemote true
@@ -11,6 +12,7 @@ configure_git() {
   git config --global user.email "20476319+krmckone@users.noreply.github.com"
   git config user.name
   git config user.email
+  basename -s .git `git config --get remote.origin.url`
 }
 
 create_deployment_branch() {
