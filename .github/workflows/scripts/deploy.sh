@@ -23,13 +23,7 @@ create_deployment_branch() {
 }
 
 copy_site_files() {
-  pwd
-  echo "Copying site artifacts to krm-site"
-  ls -lsa "$HOME/site/"
-  ls ./
-  rsync -a --delete "$HOME/site/" ./
-  ls "$HOME/site/"
-  ls ./
+  rsync -a --delete "$HOME/site/" "$HOME/krm-site/"
 }
 
 commit_changes() {
