@@ -5,9 +5,6 @@ IFS=$'\n\t'
 RELEASE_DATE=$(date +%m-%d-%y-%H:%M:%S)
 REFERENCE_LINK="krmckone/lk-site@$(git rev-parse --short "$GITHUB_SHA")"
 cd "$GITHUB_WORKSPACE/krm-site"
-git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/krmckone/krm-site.git"
-git remote -v
-git ls-remote origin HEAD
 
 configure_git() {
   git config --type bool push.autoSetupRemote true
@@ -67,17 +64,7 @@ EOF
     gh pr create --title "Automatic Release $RELEASE_DATE" --body "$body"
   fi
 
-  local retries=0
-  local max_retries=3
-
-  until gh pr merge --auto --merge; do
-    (( retries++ ))
-    if (( retries >= max_retries )); then
-      echo "Failed to enable auto-merge after $retries attempts"
-      exit 1
-    fi
-    sleep 3
-  done
+  gh pr merge --auto --merge
 }
 
 git --version
