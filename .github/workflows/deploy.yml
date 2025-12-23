@@ -41,8 +41,9 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
           repository: "krmckone/krm-site"
-          path: "krm-site"
+          path: krm-site
       - name: Get deploy script
+        working-directory: krm-site
         run: |
           curl -sL \
             -H "Authorization: token ${{ steps.app-token.outputs.token }}" \
