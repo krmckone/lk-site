@@ -9,6 +9,8 @@ configure_git() {
   git config --global --type bool push.autoSetupRemote true
   git config --global user.name "lk-site GitHub Actions Bot"
   git config --global user.email "20476319+krmckone@users.noreply.github.com"
+  git config user.name
+  git config user.email
 }
 
 create_deployment_branch() {
@@ -21,7 +23,13 @@ create_deployment_branch() {
 }
 
 copy_site_files() {
+  pwd
+  echo "Copying site artifacts to krm-site"
+  ls -lsa "$HOME/site/"
+  ls ./
   rsync -a --delete "$HOME/site/" ./
+  ls "$HOME/site/"
+  ls ./
 }
 
 commit_changes() {
