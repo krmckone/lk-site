@@ -100,6 +100,7 @@ func GetRepoRoot() string {
 		wd, err := os.Getwd()
 		if err != nil {
 			log.Fatalf("Error getting current working directory: %s", err)
+			return
 		}
 
 		for {
@@ -118,6 +119,8 @@ func GetRepoRoot() string {
 	return repoRoot
 }
 
+// MakePath transforms the argument into a path that is relative to the
+// repository root if it isn't already
 func MakePath(path string) string {
 	if strings.HasPrefix(path, GetRepoRoot()) {
 		return path
@@ -171,7 +174,7 @@ func Mkdir(path string) error {
 	return nil
 }
 
-// Clean cleans the directory at path
+// Clean deletes all files in the directory at path
 func Clean(path string) error {
 	if err := os.RemoveAll(MakePath(path)); err != nil {
 		return fmt.Errorf("error cleaning path %s: %s", MakePath(path), err)
