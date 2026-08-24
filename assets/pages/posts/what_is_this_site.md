@@ -1,5 +1,5 @@
 # What is this site?
-### 04/10/2024
+## 04/10/2024
 For quite a while now, I've wanted to learn computer graphics. I've grown up playing nintendo consoles, playstations, xboxes, and building gaming PCs. I studied computer science and mathematics as majors in college. My school, however, did not have a computer graphics track since the only graphics professor had just left for Nvidia. The only jobs I had success getting right after school were all in web development. Web dev isn't necessarily a bad gig, but it doesn't make use of my education for the most part, which is pretty disappointing. I studied CS and math because I wanted to see an intersection between pure + applied math and interesting computational problems. Life got busy too, with marriage, a dog, and some long distance moves. One thing is clear today though that was more clear when I was in college: I want to learn computer graphics. Maybe one day I can become a graphics professional; that would be a pretty solid dream job.
 
 So far, I've worked on some ray tracing in one weekend projects.
